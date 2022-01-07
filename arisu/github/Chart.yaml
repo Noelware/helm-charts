@@ -1,0 +1,31 @@
+apiVersion: v2
+name: github-bot
+description: GitHub automation bot to automate syncing translations from Arisu to/from GitHub.
+type: application
+version: "1.0.0"
+appVersion: "1.0.0"
+kubeVersion: ">=1.22"
+home: https://telemetry.arisu.land
+icon: https://cdn.arisu.land/lotus.png
+keywords:
+  - translation
+  - taas
+  - arisu
+  - automation
+  - github
+sources:
+  - 'https://github.com/auguwu/Arisu/tree/github-bot'
+dependencies:
+  - name: postgresql
+    version: 11.14.0
+    repository: https://charts.bitnami.com/bitnami
+maintainers:
+  - name: Noel
+    email: cutie@floofy.dev
+    url: https://floofy.dev
+
+  - name: Arisu Team
+    url: https://arisu.land
+    email: team@arisu.land
+annotations:
+  category: Automation

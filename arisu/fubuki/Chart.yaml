@@ -1,0 +1,25 @@
+apiVersion: v2
+name: tsubaki
+description: 💝 Website portion of Arisu, made with React + Next.js
+type: application
+version: "1.0.0"
+kubeVersion: ">=1.22"
+appVersion: "1.0.0"
+home: https://arisu.land
+icon: https://cdn.arisu.land/lotus.png
+keywords:
+  - translation
+  - taas
+  - arisu
+sources:
+  - 'https://github.com/auguwu/Arisu/tree/web'
+maintainers:
+  - name: Noel
+    email: cutie@floofy.dev
+    url: https://floofy.dev
+
+  - name: Arisu Team
+    url: https://arisu.land
+    email: team@arisu.land
+annotations:
+  category: Translation

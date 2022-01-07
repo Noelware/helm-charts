@@ -1,0 +1,34 @@
+apiVersion: v2
+name: telemetry-server
+description: 🌌 Telemetry server for Arisu, to collect error reports and data usage around Arisu development tools, made in Elixir.
+type: application
+version: "1.0.0"
+appVersion: "1.0.0"
+kubeVersion: ">=1.22"
+home: https://telemetry.arisu.land
+icon: https://cdn.arisu.land/lotus.png
+keywords:
+  - translation
+  - taas
+  - arisu
+  - telemetry
+sources:
+  - 'https://github.com/arisuland/telemetry-server'
+dependencies:
+  - name: postgresql-ha
+    version: "11.14.0"
+    repository: https://charts.bitnami.com/bitnami
+maintainers:
+  - name: Noel
+    email: cutie@floofy.dev
+    url: https://floofy.dev
+
+  - name: Arisu Team
+    url: https://arisu.land
+    email: team@arisu.land
+
+  - name: Noelware
+    url: https://noelware.org
+    email: contact@noelware.org
+annotations:
+  category: Telemetry

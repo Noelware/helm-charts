@@ -1,0 +1,59 @@
+name: Release Helm Charts
+on:
+  release:
+    types:
+      - published
+jobs:
+  post-to-s3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Helm v3.7.2
+        uses: Azure/setup-helm@master
+        with:
+          version: 3.7.2
+
+      - name: Lint all helm charts
+        run: |
+          for dir in "./arisu/*"
+          do
+            helm lint $dir
+          done
+
+      - name: Add dependency charts
+        run: helm repo add https://charts.bitnami.com/bitnami
+
+      - name: Run releaser
+        uses: helm/chart-releaser-action@main
+        with:
+          CR_TOKEN: ${{ secrets.CR_TOKEN }}
+
+  github-release-body:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Get changes
+        id: tag-commits
+        run: |
+          DATA=$(git log --oneline $(git describe --tags --abbrev=0 @^)..@)
+          ::set-output NAME=commit-data::$DATA
+
+      - name: Get tag name
+        id: tag-name
+        run: |
+          ::set-output NAME=tag::${GITHUB_REF##*/}
+
+      - name: Update release body
+        uses: tubone24/update_release@v1.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          body: |
+            # Noelware Helm Charts v${{ github.event.release.tag_name }}
+            This is a new release on the Helm Charts.
+
+            ${{ steps.tag-commits.outputs.commit-data }}

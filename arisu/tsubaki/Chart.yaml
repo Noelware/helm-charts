@@ -1,0 +1,37 @@
+apiVersion: v2
+name: tsubaki
+description: 🎀 Backend portion of Arisu, made in Go.
+type: application
+version: "1.0.0"
+appVersion: "1.0.0"
+kubeVersion: ">=1.22"
+home: https://arisu.land
+icon: https://cdn.arisu.land/lotus.png
+keywords:
+  - translation
+  - taas
+  - arisu
+sources:
+  - 'https://github.com/arisuland/tsubaki'
+dependencies:
+  - name: redis
+    version: "15.7.1"
+    repository: https://charts.bitnami.com/bitnami
+
+  - name: postgresql-ha
+    version: "8.2.1"
+    repository: https://charts.bitnami.com/bitnami
+maintainers:
+  - name: Noel
+    email: cutie@floofy.dev
+    url: https://floofy.dev
+
+  - name: Arisu Team
+    url: https://arisu.land
+    email: team@arisu.land
+
+  - name: Noelware
+    url: https://noelware.org
+    email: contact@noelware.org
+annotations:
+  category: Translation
