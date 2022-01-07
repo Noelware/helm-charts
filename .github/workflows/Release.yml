@@ -30,30 +30,31 @@ jobs:
         with:
           CR_TOKEN: ${{ secrets.CR_TOKEN }}
 
-  github-release-body:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+  # github-release-body:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v2
 
-      - name: Get changes
-        id: tag-commits
-        run: |
-          DATA=$(git log --oneline $(git describe --tags --abbrev=0 @^)..@)
-          ::set-output NAME=commit-data::$DATA
+  #     - name: Get changes
+  #       uses: actions/github-script@0.2.0
+  #       id: tag-commits
+  #       with:
+  #         github-token: ${{ github.token }}
+  #         script: |
+          
+  #     - name: Get tag name
+  #       id: tag-name
+  #       run: |
+  #         ::set-output NAME=tag::${GITHUB_REF##*/}
 
-      - name: Get tag name
-        id: tag-name
-        run: |
-          ::set-output NAME=tag::${GITHUB_REF##*/}
+  #     - name: Update release body
+  #       uses: tubone24/update_release@v1.0
+  #       env:
+  #         GITHUB_TOKEN: ${{ github.token }}
+  #       with:
+  #         body: |
+  #           # Noelware Helm Charts v${{ github.event.release.tag_name }}
+  #           This is a new release on the Helm Charts.
 
-      - name: Update release body
-        uses: tubone24/update_release@v1.0
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        with:
-          body: |
-            # Noelware Helm Charts v${{ github.event.release.tag_name }}
-            This is a new release on the Helm Charts.
-
-            ${{ steps.tag-commits.outputs.commit-data }}
+  #           ${{ steps.tag-commits.outputs.commit-data }}
