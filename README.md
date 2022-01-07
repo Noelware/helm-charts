@@ -1,2 +1,2 @@
-# charts
-🔮 A list of Helm Charts packages and licensed by Noelware
+# 🔮 Helm Charts
+> List of Helm Charts packages and licensed by Noelware
