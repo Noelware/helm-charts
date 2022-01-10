@@ -1,13 +1,13 @@
 # 🔮 Helm Charts
 [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/Noelware)](https://artifacthub.io/packages/search?repo=Noelware)
 
-> List of Helm Charts packages and licensed by Noelware
+> List of Helm Charts for Noelware projects
 
 ## Charts
 ### Arisu
 - [🎀 **Tsubaki**](./arisu/tsubaki)
 - [💝 **Fubuki**](./arisu/fubuki)
-- [:octo: **GitHub Bot**](./arisu/github)
+- [:octocat: **GitHub Bot**](./arisu/github)
 - [🌌 **Telemetry Server**](./arisu/telemetry)
 
 ## How to use a Noelware Helm Chart?
