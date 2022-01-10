@@ -4,11 +4,18 @@
 > List of Helm Charts for Noelware projects
 
 ## Charts
-### Arisu
+### [Arisu](https://arisu.land)
 - [🎀 **Tsubaki**](./arisu/tsubaki)
 - [💝 **Fubuki**](./arisu/fubuki)
 - [:octocat: **GitHub Bot**](./arisu/github)
 - [🌌 **Telemetry Server**](./arisu/telemetry)
+
+### 💫 [Kanata](https://docs.floof.gay/services/kanata)
+- [💫 **kanatad**](./kanata/daemon)
+
+### 🥐 [gitjb](https://gitjb.dev)
+- [🥐 **gitjbd**](./gitjb/daemon)
+- [🥐 **backend**](./gitjb/backend)
 
 ## How to use a Noelware Helm Chart?
 ```sh
