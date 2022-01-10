@@ -11,11 +11,14 @@
 - [🌌 **Telemetry Server**](./arisu/telemetry)
 
 ### 💫 [Kanata](https://docs.floof.gay/services/kanata)
-- [💫 **kanatad**](./kanata/daemon)
+- [**kanatad**](./kanata/daemon)
+- [**backend**](./kanata/backend)
+- [**frontend**](./kanata/frontend)
 
 ### 🥐 [gitjb](https://gitjb.dev)
-- [🥐 **gitjbd**](./gitjb/daemon)
-- [🥐 **backend**](./gitjb/backend)
+- [**gitjbd**](./gitjb/daemon)
+- [**backend**](./gitjb/backend)
+- [**frontend**](./gitjb/frontend)
 
 ## How to use a Noelware Helm Chart?
 ```sh
