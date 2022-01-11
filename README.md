@@ -12,13 +12,10 @@
 
 ### 💫 [Kanata](https://docs.floof.gay/services/kanata)
 - [**kanatad**](./kanata/daemon)
-- [**backend**](./kanata/backend)
-- [**frontend**](./kanata/frontend)
 
 ### 🥐 [gitjb](https://gitjb.dev)
 - [**gitjbd**](./gitjb/daemon)
-- [**backend**](./gitjb/backend)
-- [**frontend**](./gitjb/frontend)
+- [**core**](./gitjb/core)
 
 ## How to use a Noelware Helm Chart?
 ```sh
