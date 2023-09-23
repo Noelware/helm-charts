@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # 🐻‍❄️🔮 Noelware's Helm Charts: Curated catalog of Noelware's Helm charts.
 # Copyright (c) 2022-2023 Noelware, LLC. <team@noelware.org>

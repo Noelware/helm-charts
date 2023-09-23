@@ -22,4 +22,21 @@
 {{- if not .Values.persistence.data.existingClaim -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
+metadata:
+    name: {{ printf "%s-%s" (include "youtrack.fullname" .) .Values.persistence.data.claimName }}
+    namespace: {{ .Release.Namespace | quote }}
+    labels:
+        {{- include "youtrack.labels" . | nindent 6 }}
+    annotations:
+        {{- include "youtrack.annotations" . | nindent 6 }}
+spec:
+    storageClassName: {{ .Values.persistence.data.storageClass }}
+    volumeName: {{ printf "%s-%s" (include "youtrack.fullname" .) "pv" }}
+    resources:
+        requests:
+            storage: {{ .Values.persistence.data.size }}
+    accessModes:
+    {{- with .Values.persistence.data.accessModes -}}
+        {{ toYaml . | nindent 6 }}
+    {{- end }}
 {{- end }}

@@ -22,7 +22,7 @@
 kubeVersion: ">=1.24"
 description: Unofficial Helm chart for the `jetbrains/youtrack` Docker image.
 apiVersion: v2
-appVersion: 2.4.2
+appVersion: "2023.1.18508"
 version: 0.1.0
 type: application
 home: https://jetbrains.com/youtrack
@@ -44,7 +44,7 @@ dependencies:
   - name: common
     version: 2.9.0
     repository: oci://registry-1.docker.io/bitnamicharts
-  - name: hub
-    version: 0.1.0
-    repository: https://charts.noelware.org/~/noelware
-    condition: external.hub.enabled
+  # - name: hub
+  #   version: 0.1.0
+  #   repository: https://charts.noelware.org/~/noelware
+  #   condition: external.hub.enabled

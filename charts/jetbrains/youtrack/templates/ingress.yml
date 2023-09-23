@@ -19,18 +19,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-load("@rules_helm//helm:defs.bzl", "helm_repository")
-
-[helm_repository(
-    name = name,
-    chart = "//charts/%s" % name,
-    plugins = ["//:charted"],
-) for name in [
-    "bazel-remote-cache",
-    "elastic-agent",
-    "elasticsearch",
-    "fleet-server",
-    "kibana",
-    "logstash",
-    "redpanda",
-]]
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "youtrack.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- if and .Values.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.ingress.annotations "kubernetes.io/ingress.class" .Values.ingress.className}}
+  {{- end }}
+{{- end }}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}

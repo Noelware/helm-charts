@@ -97,6 +97,18 @@ to `<youtrack url>/hub`.
 | `persistence.conf.selector`         | Mapping of the [selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to filter when creating the conf PVC.    | `{}`                |
 | `persistence.conf.size`             | Size of the PVC to provision.                                                                                                                 | `512MiB`            |
 
+### Service Parameters
+
+Parameters to configure a [Kubernetes service](https://kubernetes.io/docs/concepts/services-networking/service/) to allow external connections to your
+YouTrack instance.
+
+| Name                     | Description                                                                                                                    | Value       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| `service.enabled`        | Whether or not if a Kubernetes service should be enabled.                                                                      | `true`      |
+| `service.type`           | The [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) to use. | `ClusterIP` |
+| `service.selectorLabels` | Selector to apply this Kubernetes service to                                                                                   | `{}`        |
+| `service.port`           | The port that YouTrack will listen on.                                                                                         | `8080`      |
+
 ### Configure Parameters
 
 Parameters to use when configuring your YouTrack installation. This will create a init container
@@ -106,3 +118,18 @@ that will append a mapping of all flags to passthrough.
 | ------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | `configure.enabled` | Whether of not the init container should be spawned.                                                  | `true`                                                                           |
 | `configure.flags`   | A list of flags to inject into the `youtrack configure` command. This can be used as a Helm template. | `-J-Dorg.eclipse.jetty.server.Request.maxFormKeys=10000 -J-Xmx1024m -no-browser` |
+
+### Ingress
+
+[Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress) configuration.
+
+| Name                  | Description                                                                                                                     | Value                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `ingress.enabled`     | Whether if Ingress record generation should be enabled or not.                                                                  | `false`                  |
+| `ingress.pathType`    | Whatever [path type](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types) to use.                       | `ImplementationSpecific` |
+| `ingress.hostname`    | Default host for the Ingress record.                                                                                            | `youtrack.local`         |
+| `ingress.path`        | Default path for the Ingress record.                                                                                            | `/`                      |
+| `ingress.annotations` | Additional annotations for the Ingress record. To enable certificate autogeneration, place the `cert-manager` annotations here. | `{}`                     |
+| `ingress.extraHosts`  | List of extra hosts to add to the Ingress record.                                                                               | `[]`                     |
+| `ingress.extraPaths`  | List of extra paths to add to the Ingress record.                                                                               | `[]`                     |
+| `ingress.extraRules`  | Any extra rules to add to the Ingress record.                                                                                   | `[]`                     |
