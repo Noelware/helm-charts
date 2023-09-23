@@ -19,26 +19,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-load("@rules_helm//helm:defs.bzl", "helm_chart", "helm_lint")
-load("@rules_helm//noelware:charted.bzl", "helm_push")
-
-helm_chart(
-    name = "bazel-remote-cache",
-    srcs = glob(["templates/**/*.{yml,yaml}"]) + ["templates/NOTES.txt"],
-    chart_yaml = "Chart.yaml",
-    plugins = {
-        "//:charted": ".charted.yaml",
-    },
-    values_yaml = "values.yaml",
-)
-
-helm_lint(
-    name = "lint",
-    chart = ":bazel-remote-cache",
-)
-
-helm_push(
-    name = "push",
-    chart = ":bazel-remote-cache",
-    plugin = "//:charted",
-)
+kubeVersion: ">=1.24"
+description: Unofficial Helm chart for the `jetbrains/youtrack` Docker image.
+apiVersion: v2
+appVersion: 2.4.2
+version: 0.1.0
+type: application
+home: https://jetbrains.com/youtrack
+name: youtrack
+keywords:
+  - youtrack
+  - jetbrains
+maintainers:
+  - name: Noelware, LLC.
+    email: team@noelware.org
+    url: https://noelware.org
+  - name: Noel Towa
+    email: cutie@floofy.dev
+    url: https://floofy.dev
+annotations:
+  charts.noelware.org/licenses: Apache-2.0
+  charts.noelware.org/categories: IssueManagement
+dependencies:
+  - name: common
+    version: 2.9.0
+    repository: oci://registry-1.docker.io/bitnamicharts
+  - name: hub
+    version: 0.1.0
+    repository: https://charts.noelware.org/~/noelware
+    condition: external.hub.enabled

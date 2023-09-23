@@ -522,4 +522,8 @@ FodyWeavers.xsd
 ### VisualStudio Patch ###
 # Additional files built by Visual Studio
 
-# End of https://www.toptal.com/developers/gitignore/api/Helm,Bazel,VisualStudio,VisualStudioCode,JetBrains+All
+.cache/
+
+# not useful to commit?
+package.json
+package-lock.json

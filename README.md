@@ -6,15 +6,10 @@
 
 **helm-charts** is Noelware's curated catalog of [Helm](https://helm.sh) charts that we use in production today. We do maintain our own charts for Elasticsearch, Kibana, Logstash, fleet-server, and Elastic Agent due to the official Helm charts being deprecated ([elastic/helm-charts](https://github.com/elastic/helm-charts)).
 
-We do use Bazel to manage our Helm charts to:
+## Noelware's Products :: Helm Charts
+Since we have a unified structure on how we distribute our products, it'll most likely be under `distribution/helm`.
 
-* have a hermetic Helm toolchain,
-* make it easier to push, test, and lint charts without having `helm` installed.
-
-This uses our [rules_helm](https://github.com/Noelware/rules_helm) Bazel ruleset to do what we want.
-
-## Noelware's Products Helm Charts
-* [Noeldoc Registry](https://github.com/Noelware/noeldoc/tree/master/distribution/helm)
+* [Noeldoc Registry](https://github.com/Noelware/noeldoc/tree/master/registry/distribution/helm)
 * [charted-server](https://github.com/charted-dev/charted/tree/main/distribution/helm)
 * [AuthKit](https://github.com/Noelware/AuthKit/tree/master/distribution/helm)
 * [Petal](https://github.com/Noelware/Petal/tree/master/distribution/helm)
