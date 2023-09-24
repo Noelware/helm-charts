@@ -19,5 +19,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-repository: noelware/elasticsearch
 registry: https://charts.noelware.org/api
+repositories:
+  - ./charts

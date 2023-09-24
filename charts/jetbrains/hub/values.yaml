@@ -1,0 +1,209 @@
+# 🐻‍❄️🔮 Noelware's Helm Charts: Curated catalog of Noelware's Helm charts.
+# Copyright (c) 2022-2023 Noelware, LLC. <team@noelware.org>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+## @section Global Parameters
+## @descriptionStart
+## Contains any global parameters that will affected all objects in the `youtrack` Helm chart.
+## @descriptionEnd
+##
+## @param global.replicas Amount of replicas to spawn
+## @param global.resources Resource list to apply to all containers.
+## @param global.fullNameOverride String to fully override the Helm installation name for all objects
+## @param global.nameOverride String to override the Helm installation name for all objects, will be in conjunction with a prefix of `<install-name>-`
+## @param global.clusterDomain Domain host that maps to the cluster
+## @param global.nodeSelector Selector labels to apply to contraint the pods to specific nodes. Read more in the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector).
+## @param global.tolerations List of all taints/tolerations to apply in conjunction with `global.affinity`. Read more in the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration)
+## @param global.affinity Map of all the affinity to apply to the spawned Pods. Read more in the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/assign-pods-nodes-using-node-affinity/).
+## @param global.annotations Map of annotations to append to on all objects that this Helm chart creates.
+## @param global.extraEnvVars List of extra environment variables to append to all init/sidecar containers and normal containers.
+## @param global.initContainers List of init containers to create.
+## @param global.podSecurityContext Security context for all spawned Pods. Read more in the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+## @param global.containerSecurityContext Security context for all init, sidecar, and normal containers. Read more in the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+global:
+  replicas: 1
+  fullNameOverride: ""
+  nameOverride: ""
+  clusterDomain: cluster.local
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  annotations: {}
+  extraEnvVars: []
+  initContainers: []
+  podSecurityContext: {}
+  containerSecurityContext: {}
+  resources: {}
+    ## Example:
+    ##  limits:
+    ##    memory: 2Gi
+    ##    cpu: 1500m
+    ##  requests:
+    ##    memory: 512Mi
+    ##    cpu: 150m
+
+## @section Docker Image Parameters
+## @descriptionStart
+## Parameters to modify the Docker image that is ran.
+## @descriptionEnd
+##
+## @param image.pullPolicy [string] [Pull policy](https://kubernetes.io/docs/concepts/containers/images/#image-pull-policy) when pulling the image.
+## @param image.registry Registry URL to point to. For Docker Hub, use an empty string.
+## @param image.image Image name.
+## @param image.tag The tag of the image. Keep this as a empty string if you wish to use the default app's version.
+## @param image.digest Digest in the form of `<alg>:<hex>`, this will replace the `image.tag` property if this is not empty.
+image:
+  pullPolicy: IfNotPresent
+  registry: "" # keep empty to use docker hub
+  image: jetbrains/hub
+  tag: "" # keep empty for the app version
+  digest: ""
+
+## @section Service Account Parameters
+## @param serviceAccount.create Whether or not if the service account should be created for this Helm installation.
+## @param serviceAccount.annotations Any additional annotations to append to this ServiceAccount
+## @param serviceAccount.name The name of the service account, this will be the Helm installation name if this is empty.
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+## @section Persistence Parameters
+## @param persistence.data.existingClaim Existing PVC name to mount instead of the chart creating one.
+## @param persistence.data.storageClass The storage class to use when creating the data's PVC.
+## @param persistence.data.annotations Mapping of any extra annotations to append.
+## @param persistence.data.accessModes List of [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) to use when creating the data PVC.
+## @param persistence.data.claimName Name of the PVC to create, if `persistence.data.existingClaim` is not set to `true`.
+## @param persistence.data.selector Mapping of the [selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to filter when creating the data PVC.
+## @param persistence.data.size Size of the PVC to provision.
+## @param persistence.backups.existingClaim Existing PVC name to mount instead of the chart creating one.
+## @param persistence.backups.storageClass The storage class to use when creating the backups PVC.
+## @param persistence.backups.annotations Mapping of any extra annotations to append.
+## @param persistence.backups.accessModes List of [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) to use when creating the backups PVC.
+## @param persistence.backups.claimName Name of the PVC to create, if `persistence.data.existingClaim` is not set to `true`.
+## @param persistence.backups.selector Mapping of the [selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to filter when creating the backups PVC.
+## @param persistence.backups.size Size of the PVC to provision.
+## @param persistence.logs.existingClaim Existing PVC name to mount instead of the chart creating one.
+## @param persistence.logs.storageClass The storage class to use when creating the logs's PVC.
+## @param persistence.logs.annotations Mapping of any extra annotations to append.
+## @param persistence.logs.accessModes List of [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) to use when creating the logs PVC.
+## @param persistence.logs.claimName Name of the PVC to create, if `persistence.data.existingClaim` is not set to `true`.
+## @param persistence.logs.selector Mapping of the [selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to filter when creating the logs PVC.
+## @param persistence.logs.size Size of the PVC to provision.
+## @param persistence.conf.existingClaim Existing PVC name to mount instead of the chart creating one.
+## @param persistence.conf.storageClass The storage class to use when creating the conf's PVC.
+## @param persistence.conf.annotations Mapping of any extra annotations to append.
+## @param persistence.conf.accessModes List of [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) to use when creating the conf PVC.
+## @param persistence.conf.claimName Name of the PVC to create, if `persistence.data.existingClaim` is not set to `true`.
+## @param persistence.conf.selector Mapping of the [selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to filter when creating the conf PVC.
+## @param persistence.conf.size Size of the PVC to provision.
+persistence:
+  data:
+    existingClaim: ""
+    storageClass: ""
+    annotations: {}
+    claimName: data
+    selector: {}
+    size: 10Gi
+    accessModes:
+      - ReadWriteMany
+  backups:
+    existingClaim: ""
+    storageClass: ""
+    annotations: {}
+    claimName: backups
+    selector: {}
+    size: 10Gi
+    accessModes:
+      - ReadWriteMany
+  logs:
+    existingClaim: ""
+    storageClass: ""
+    annotations: {}
+    claimName: logs
+    selector: {}
+    size: 5Gi
+    accessModes:
+      - ReadWriteMany
+  conf:
+    existingClaim: ""
+    storageClass: ""
+    annotations: {}
+    claimName: conf
+    selector: {}
+    size: 512Mi
+    accessModes:
+      - ReadWriteMany
+
+## @section Service Parameters
+## @descriptionStart
+## Parameters to configure a [Kubernetes service](https://kubernetes.io/docs/concepts/services-networking/service/) to allow external connections to your
+## JetBrains Hub instance.
+## @descriptionEnd
+##
+## @param service.clusterIP IP to use for the cluster IP if `type` is `ClusterIP`.
+## @param service.enabled Whether or not if a Kubernetes service should be enabled.
+## @param service.type The [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) to use.
+## @param service.selectorLabels Selector to apply this Kubernetes service to
+## @param service.port The port that YouTrack will listen on.
+service:
+  enabled: true
+  type: ClusterIP
+  selectorLabels: {}
+  port: 8080
+  clusterIP: ""
+
+## @section Configure Parameters
+## @descriptionStart
+## Parameters to use when configuring your JetBrains Hub installation. This will create a init container
+## that will append a mapping of all flags to passthrough.
+## @descriptionEnd
+##
+## @param configure.enabled Whether of not the init container should be spawned.
+## @param configure.flags A list of flags to inject into the `youtrack configure` command. This can be used as a Helm template.
+configure:
+  enabled: true
+  flags: |
+    -J-Dorg.eclipse.jetty.server.Request.maxFormKeys=10000 -J-Xmx1024m -no-browser
+
+## @section Ingress
+## @descriptionStart
+## [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress) configuration.
+## @descriptionEnd
+##
+## @param ingress.className Ingress class name to use.
+## @param ingress.enabled Whether if Ingress record generation should be enabled or not.
+## @param ingress.pathType Whatever [path type](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types) to use.
+## @param ingress.hostname Default host for the Ingress record.
+## @param ingress.path Default path for the Ingress record.
+## @param ingress.annotations Additional annotations for the Ingress record. To enable certificate autogeneration, place the `cert-manager` annotations here.
+## @param ingress.extraHosts List of extra hosts to add to the Ingress record.
+## @param ingress.extraPaths List of extra paths to add to the Ingress record.
+## @param ingress.extraRules Any extra rules to add to the Ingress record.
+ingress:
+  enabled: false
+  pathType: ImplementationSpecific
+  hostname: hub.local
+  className: ""
+  path: /
+  annotations: {}
+  extraHosts: []
+  extraPaths: []
+  extraRules: []

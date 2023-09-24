@@ -19,5 +19,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-repository: noelware/elastic-agent
-registry: https://charts.noelware.org/api
+kubeVersion: ">=1.24"
+description: Unofficial Helm chart for the `jetbrains/hub` Docker image.
+apiVersion: v2
+appVersion: "2023.2.18873"
+version: 0.1.0
+type: application
+home: https://jetbrains.com/hub
+name: hub
+keywords:
+  - youtrack
+  - hub
+  - jetbrains
+maintainers:
+  - name: Noelware, LLC.
+    email: team@noelware.org
+    url: https://noelware.org
+  - name: Noel Towa
+    email: cutie@floofy.dev
+    url: https://floofy.dev
+annotations:
+  charts.noelware.org/licenses: Apache-2.0
+  charts.noelware.org/categories: Authorization,Authentication
+dependencies:
+  - name: common
+    version: 2.9.0
+    repository: oci://registry-1.docker.io/bitnamicharts

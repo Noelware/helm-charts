@@ -19,26 +19,4 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-load("@rules_helm//helm:defs.bzl", "helm_chart", "helm_lint")
-load("@rules_helm//noelware:charted.bzl", "helm_push")
-
-helm_chart(
-    name = "elasticsearch",
-    srcs = glob(["templates/**/*.{yml,yaml}"]) + ["templates/NOTES.txt"],
-    chart_yaml = "Chart.yaml",
-    plugins = {
-        "//:charted": ".charted.yaml",
-    },
-    values_yaml = "values.yaml",
-)
-
-helm_lint(
-    name = "lint",
-    chart = ":elasticsearch",
-)
-
-helm_push(
-    name = "push",
-    chart = ":elasticsearch",
-    plugin = "//:charted",
-)
+repository: noelware/jetbrains-hub

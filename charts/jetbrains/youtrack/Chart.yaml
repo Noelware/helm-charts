@@ -22,7 +22,7 @@
 kubeVersion: ">=1.24"
 description: Unofficial Helm chart for the `jetbrains/youtrack` Docker image.
 apiVersion: v2
-appVersion: "2023.1.18508"
+appVersion: 2023.2.18873
 version: 0.1.0
 type: application
 home: https://jetbrains.com/youtrack
