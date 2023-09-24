@@ -27,6 +27,7 @@ version: 0.1.0
 type: application
 home: https://jetbrains.com/youtrack
 name: youtrack
+icon: https://resources.jetbrains.com/storage/products/company/brand/logos/YouTrack_icon.svg
 keywords:
   - youtrack
   - jetbrains

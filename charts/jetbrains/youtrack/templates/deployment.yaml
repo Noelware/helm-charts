@@ -1,0 +1,145 @@
+{{/*
+~ 🐻‍❄️🔮 Noelware's Helm Charts: Curated catalog of Noelware's Helm charts.
+~ Copyright (c) 2022-2023 Noelware, LLC. <team@noelware.org>
+~
+~ Permission is hereby granted, free of charge, to any person obtaining a copy
+~ of this software and associated documentation files (the "Software"), to deal
+~ in the Software without restriction, including without limitation the rights
+~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+~ copies of the Software, and to permit persons to whom the Software is
+~ furnished to do so, subject to the following conditions:
+~
+~ The above copyright notice and this permission notice shall be included in all
+~ copies or substantial portions of the Software.
+~
+~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+~ SOFTWARE.
+*/}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: {{ include "youtrack.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+    labels:
+        {{- include "youtrack.labels" . | nindent 6 }}
+    annotations:
+        {{ include "youtrack.annotations" . | nindent 6 }}
+spec:
+    replicas: {{ .Values.global.replicas }}
+    selector:
+        matchLabels:
+            {{- include "youtrack.labels" . | nindent 10 }}
+    template:
+        metadata:
+            labels:
+                {{- include "youtrack.labels" . | nindent 14 }}
+        spec:
+            serviceAccountName: {{ include "youtrack.serviceAccountName" . }}
+            {{- if .Values.global.affinity }}
+            affinity: {{- include "common.tplvalues.render" (dict "value" .Values.global.affinity "context" $) | nindent 14 }}
+            {{- end }}
+            {{- if .Values.global.nodeSelector }}
+            nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.global.nodeSelector "context" $) | nindent 14 }}
+            {{- end }}
+            {{- if .Values.global.tolerations }}
+            tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.global.tolerations "context" $) | nindent 14 }}
+            {{- end }}
+            volumes:
+                {{ $dataConf := printf "%s-%s" (include "youtrack.fullname" .) .Values.persistence.data.claimName }}
+                - name: data
+                  persistentVolumeClaim:
+                    claimName: {{ default $dataConf .Values.persistence.data.existingClaim }}
+                {{ $logsConf := printf "%s-%s" (include "youtrack.fullname" .) .Values.persistence.logs.claimName }}
+                - name: logs
+                  persistentVolumeClaim:
+                    claimName: {{ default $logsConf .Values.persistence.logs.existingClaim }}
+                {{ $pvcConf := printf "%s-%s" (include "youtrack.fullname" .) .Values.persistence.conf.claimName }}
+                - name: conf
+                  persistentVolumeClaim:
+                    claimName: {{ default $pvcConf .Values.persistence.conf.existingClaim }}
+                {{ $backupsConf := printf "%s-%s" (include "youtrack.fullname" .) .Values.persistence.backups.claimName }}
+                - name: backups
+                  persistentVolumeClaim:
+                    claimName: {{ default $backupsConf .Values.persistence.backups.existingClaim }}
+            # initContainers:
+            #     - name: {{ include "youtrack.fullname" . }}-volume-permissions
+            #       {{/* the official image uses debian, so why not use that? */}}
+            #       image: debian:bullseye
+            #       imagePullPolicy: IfNotPresent
+            #       resources: {}
+            #       command:
+            #         - /bin/bash
+            #         - -ec
+            #         - chown -R 13001:13001 /opt/youtrack/data /opt/youtrack/logs /opt/youtrack/backups /opt/youtrack/conf
+            #       securityContext:
+            #         runAsUser: 0
+            #       volumeMounts:
+            #         - name: data
+            #           mountPath: /opt/youtrack/data
+            #         - name: logs
+            #           mountPath: /opt/youtrack/logs
+            #         - name: backups
+            #           mountPath: /opt/youtrack/backups
+            #         - name: conf
+            #           mountPath: /opt/youtrack/conf
+            #     {{- if and .Values.configure.enabled .Values.configure.flags }}
+            #     - name: {{ include "youtrack.fullname" . }}-configure-instance
+            #       image: {{ template "youtrack.image" . }}
+            #       imagePullPolicy: {{ .Values.image.pullPolicy }}
+            #       resources: {}
+            #       command:
+            #         - /bin/bash
+            #         - -ec
+            #         - youtrack configure {{ .Values.configure.flags }}
+            #         {{- if and .Values.ingress.enabled .Values.ingress.hostname (ne .Values.ingress.hostname "youtrack.local") }}
+            #         - -base-url=http://{{ .Values.ingress.hostname }}
+            #         {{- end }}
+            #         {{- if and .Values.external.hub.enabled .Values.external.hub.url }}
+            #         - -hub-url={{ .Values.external.hub.url }}
+            #         {{- end }}
+            #       volumeMounts:
+            #         - name: data
+            #           mountPath: /opt/youtrack/data
+            #         - name: logs
+            #           mountPath: /opt/youtrack/logs
+            #         - name: backups
+            #           mountPath: /opt/youtrack/backups
+            #         - name: conf
+            #           mountPath: /opt/youtrack/conf
+            #     {{- end }}
+            {{- if .Values.global.initContainers }}
+            initContainers:
+            {{- include "common.tplvalues.render" (dict "value" .Values.global.initContainers "context" $) | nindent 12 }}
+            {{- end }}
+            {{- $podSecurityContext := default (include "youtrack.defaultPodSecurityContext" .) .Values.global.podSecurityContext }}
+            securityContext: {{- include "common.tplvalues.render" (dict "value" $podSecurityContext "context" $) | nindent 14 }}
+            containers:
+                - name: {{ include "youtrack.fullname" . }}
+                  image: {{ template "youtrack.image" . }}
+                  imagePullPolicy: {{ .Values.image.pullPolicy }}
+                  {{- $containerSecurityContext := default (include "youtrack.defaultContainerSecurityContext" .) .Values.global.containerSecurityContext }}
+                  securityContext: {{- include "common.tplvalues.render" (dict "value" $containerSecurityContext "context" $) | nindent 20 }}
+                  {{- if .Values.global.extraEnvVars }}
+                  env: {{- include "common.tplvalues.render" (dict "value" .Values.global.extraEnvVars "context" $) | nindent 20}}
+                  {{- end }}
+                  {{- $resources := default (include "youtrack.defaultResourceLimits" .) .Values.global.resources }}
+                  resources: {{- include "common.tplvalues.render" (dict "value" $resources "context" $) | nindent 20 }}
+                  containerPorts:
+                    - name: http
+                      protocol: TCP
+                      containerPort: {{ .Values.service.port }}
+                  volumeMounts:
+                    - name: data
+                      mountPath: /opt/youtrack/data
+                    - name: logs
+                      mountPath: /opt/youtrack/logs
+                    - name: backups
+                      mountPath: /opt/youtrack/backups
+                    - name: conf
+                      mountPath: /opt/youtrack/conf

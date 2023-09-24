@@ -57,11 +57,7 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "youtrack.labels" -}}
-k8s.noelware.cloud/chart: {{ include "youtrack.chart" . }}
 {{ include "youtrack.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-k8s.noelware.cloud/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
 k8s.noelware.cloud/managed-by: Helm
 {{- end }}
 
@@ -87,6 +83,9 @@ Default annotations
 {{- define "youtrack.annotations" -}}
 k8s.noelware.cloud/component: issue-management
 k8s.noelware.cloud/product: youtrack
+{{- if .Chart.AppVersion }}
+k8s.noelware.cloud/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
 
 {{- range $key, $val := .Values.global.annotations }}
     {{ $key }}: {{ $val | quote }}
@@ -97,8 +96,7 @@ k8s.noelware.cloud/product: youtrack
 Default Pod security context object
 */}}
 {{- define "youtrack.defaultPodSecurityContext" -}}
-enabled: true
-fsGroup: 1001
+fsGroup: 13001
 seccompProfile:
   type: "RuntimeDefault"
 {{- end -}}
@@ -107,11 +105,41 @@ seccompProfile:
 Default container security context object
 */}}
 {{- define "youtrack.defaultContainerSecurityContext" -}}
-enabled: true
-runAsUser: 1001
+runAsUser: 13001
 runAsNonRoot: true
 readOnlyRootFilesystem: false
 allowPrivilegeEscalation: false
 capabilities:
   drop: ["ALL"]
+{{- end -}}
+
+{{/*
+Default resource limits
+*/}}
+{{- define "youtrack.defaultResourceLimits" -}}
+limits:
+    memory: 4Gi
+    cpu: 1500m
+requests:
+    memory: 1Gi
+    cpu: 500m
+{{- end -}}
+
+{{/*
+Image definition for YouTrack
+*/}}
+{{- define "youtrack.image" -}}
+{{/* define our variables */}}
+{{- $registry := default "docker.io" .Values.image.registry -}}
+{{- $repo := .Values.image.image -}}
+{{- $tag := default .Chart.AppVersion .Values.image.tag -}}
+{{- $sep := ":" -}}
+
+{{- if .Values.image.digest }}
+    {{- $tag := .Values.image.digest | toString -}}
+    {{- $sep := "@" -}}
+{{- end -}}
+
+{{/* bring it all together */}}
+{{- printf "%s/%s%s%s" $registry $repo $sep $tag -}}
 {{- end -}}

@@ -25,6 +25,7 @@
 ## @descriptionEnd
 ##
 ## @param global.replicas Amount of replicas to spawn
+## @param global.resources Resource list to apply to all containers.
 ## @param global.fullNameOverride String to fully override the Helm installation name for all objects
 ## @param global.nameOverride String to override the Helm installation name for all objects, will be in conjunction with a prefix of `<install-name>-`
 ## @param global.clusterDomain Domain host that maps to the cluster
@@ -49,6 +50,14 @@ global:
   initContainers: []
   podSecurityContext: {}
   containerSecurityContext: {}
+  resources: {}
+    ## Example:
+    ##  limits:
+    ##    memory: 2Gi
+    ##    cpu: 1500m
+    ##  requests:
+    ##    memory: 512Mi
+    ##    cpu: 150m
 
 ## @section Docker Image Parameters
 ## @descriptionStart
@@ -124,7 +133,7 @@ persistence:
     annotations: {}
     claimName: data
     selector: {}
-    size: 10GiB
+    size: 10Gi
     accessModes:
       - ReadWriteMany
   backups:
@@ -133,7 +142,7 @@ persistence:
     annotations: {}
     claimName: backups
     selector: {}
-    size: 10GiB
+    size: 10Gi
     accessModes:
       - ReadWriteMany
   logs:
@@ -142,7 +151,7 @@ persistence:
     annotations: {}
     claimName: logs
     selector: {}
-    size: 5GiB
+    size: 5Gi
     accessModes:
       - ReadWriteMany
   conf:
@@ -151,7 +160,7 @@ persistence:
     annotations: {}
     claimName: conf
     selector: {}
-    size: 512MiB
+    size: 512Mi
     accessModes:
       - ReadWriteMany
 
@@ -161,6 +170,7 @@ persistence:
 ## YouTrack instance.
 ## @descriptionEnd
 ##
+## @param service.clusterIP IP to use for the cluster IP if `type` is `ClusterIP`.
 ## @param service.enabled Whether or not if a Kubernetes service should be enabled.
 ## @param service.type The [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) to use.
 ## @param service.selectorLabels Selector to apply this Kubernetes service to
@@ -170,6 +180,7 @@ service:
   type: ClusterIP
   selectorLabels: {}
   port: 8080
+  clusterIP: ""
 
 ## @section Configure Parameters
 ## @descriptionStart
@@ -181,7 +192,7 @@ service:
 ## @param configure.flags A list of flags to inject into the `youtrack configure` command. This can be used as a Helm template.
 configure:
   enabled: true
-  flags: |-
+  flags: |
     -J-Dorg.eclipse.jetty.server.Request.maxFormKeys=10000 -J-Xmx1024m -no-browser
 
 ## @section Ingress
@@ -189,6 +200,7 @@ configure:
 ## [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress) configuration.
 ## @descriptionEnd
 ##
+## @param ingress.className Ingress class name to use.
 ## @param ingress.enabled Whether if Ingress record generation should be enabled or not.
 ## @param ingress.pathType Whatever [path type](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types) to use.
 ## @param ingress.hostname Default host for the Ingress record.
@@ -201,6 +213,7 @@ ingress:
   enabled: false
   pathType: ImplementationSpecific
   hostname: youtrack.local
+  className: ""
   path: /
   annotations: {}
   extraHosts: []
