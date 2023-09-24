@@ -21,7 +21,7 @@
 
 ## @section Global Parameters
 ## @descriptionStart
-## Contains any global parameters that will affected all objects in the `youtrack` Helm chart.
+## Contains any global parameters that will affected all objects in the `jetbrains-hub` Helm chart.
 ## @descriptionEnd
 ##
 ## @param global.replicas Amount of replicas to spawn
@@ -162,7 +162,7 @@ persistence:
 ## @param service.enabled Whether or not if a Kubernetes service should be enabled.
 ## @param service.type The [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) to use.
 ## @param service.selectorLabels Selector to apply this Kubernetes service to
-## @param service.port The port that YouTrack will listen on.
+## @param service.port The port that JetBrains Hub will listen on.
 service:
   enabled: true
   type: ClusterIP
@@ -177,7 +177,7 @@ service:
 ## @descriptionEnd
 ##
 ## @param configure.enabled Whether of not the init container should be spawned.
-## @param configure.flags A list of flags to inject into the `youtrack configure` command. This can be used as a Helm template.
+## @param configure.flags A list of flags to inject into the `hub configure` command. This can be used as a Helm template.
 configure:
   enabled: true
   flags: |

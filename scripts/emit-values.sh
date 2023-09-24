@@ -55,13 +55,8 @@ fi
 # TODO(@auguwu): auto generate this list (if we need to)
 charts=(
     "$DIR/charts/bazel-remote-cache"
-    "$DIR/charts/elastic-agent"
-    "$DIR/charts/elasticsearch"
-    "$DIR/charts/fleet-server"
     "$DIR/charts/jetbrains/hub"
     "$DIR/charts/jetbrains/youtrack"
-    "$DIR/charts/kibana"
-    "$DIR/charts/logstash"
 )
 
 for chart in "${charts[@]}"; do
