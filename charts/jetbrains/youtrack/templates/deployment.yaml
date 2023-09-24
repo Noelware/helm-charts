@@ -130,7 +130,7 @@ spec:
                   {{- end }}
                   {{- $resources := default (include "youtrack.defaultResourceLimits" .) .Values.global.resources }}
                   resources: {{- include "common.tplvalues.render" (dict "value" $resources "context" $) | nindent 20 }}
-                  containerPorts:
+                  ports:
                     - name: http
                       protocol: TCP
                       containerPort: {{ .Values.service.port }}
