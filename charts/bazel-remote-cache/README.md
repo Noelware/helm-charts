@@ -49,3 +49,41 @@ $ helm install bazel-remote-cache noelware/bazel-remote-cache
 | `serviceAccount.create`      | Whether or not if the service account should be created for this Helm installation.        | `true` |
 | `serviceAccount.annotations` | Any additional annotations to append to this ServiceAccount                                | `{}`   |
 | `serviceAccount.name`        | The name of the service account, this will be the Helm installation name if this is empty. | `""`   |
+
+### Configuration Parameters
+
+| Name                     | Description                                                                           | Value    |
+| ------------------------ | ------------------------------------------------------------------------------------- | -------- |
+| `config.existingMapName` | An existing ConfigMap that provides the configuration                                 | `""`     |
+| `config.configKey`       | The configuration key to use in the ConfigMap, defaults to `config.yml`               | `""`     |
+| `config.mapName`         | The name of the ConfigMap to create or update if `config.existingMapName` is not set. | `config` |
+
+### Service Parameters
+
+Parameters to configure a [Kubernetes service](https://kubernetes.io/docs/concepts/services-networking/service/) to allow external connections to your
+Bazel Remote Cache instance
+
+| Name                     | Description                                                                                                                    | Value       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| `service.clusterIP`      | IP to use for the cluster IP if `type` is `ClusterIP`.                                                                         | `""`        |
+| `service.enabled`        | Whether or not if a Kubernetes service should be enabled.                                                                      | `true`      |
+| `service.type`           | The [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) to use. | `ClusterIP` |
+| `service.selectorLabels` | Selector to apply this Kubernetes service to                                                                                   | `{}`        |
+| `service.ports.http`     | HTTP port to listen on                                                                                                         | `8080`      |
+| `service.ports.grpc`     | gRPC port to listen on                                                                                                         | `""`        |
+
+### Ingress
+
+[Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress) configuration.
+
+| Name                  | Description                                                                                                                     | Value                    |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| `ingress.className`   | Ingress class name to use.                                                                                                      | `""`                     |
+| `ingress.enabled`     | Whether if Ingress record generation should be enabled or not.                                                                  | `false`                  |
+| `ingress.pathType`    | Whatever [path type](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types) to use.                       | `ImplementationSpecific` |
+| `ingress.hostname`    | Default host for the Ingress record.                                                                                            | `bazel-remote.local`     |
+| `ingress.path`        | Default path for the Ingress record.                                                                                            | `/`                      |
+| `ingress.annotations` | Additional annotations for the Ingress record. To enable certificate autogeneration, place the `cert-manager` annotations here. | `{}`                     |
+| `ingress.extraHosts`  | List of extra hosts to add to the Ingress record.                                                                               | `[]`                     |
+| `ingress.extraPaths`  | List of extra paths to add to the Ingress record.                                                                               | `[]`                     |
+| `ingress.extraRules`  | Any extra rules to add to the Ingress record.                                                                                   | `[]`                     |

@@ -1,3 +1,4 @@
+{{/*
 # 🐻‍❄️🔮 Noelware's Helm Charts: Curated catalog of Noelware's Helm charts.
 # Copyright (c) 2022-2023 Noelware, LLC. <team@noelware.org>
 #
@@ -18,3 +19,35 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+*/}}
+
+{{- if .Values.service.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+    name: {{ include "bazel-remote.fullname" . }}
+    labels:
+        {{- include "bazel-remote.labels" | nindent 6 }}
+    annotations:
+        {{- include "bazel-remote.annotations" | nindent 6 }}
+spec:
+    type: {{ .Values.service.type | quote }}
+    {{- if .Values.service.clusterIP }}
+    clusterIP: {{ .Values.service.clusterIP | quote }}
+    {{- end }}
+    selector:
+        {{- include "bazel-remote.labels" | nindent 8 }}
+        {{- if .Values.service.selectorLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.service.selectorLabels "context" $) | nindent 8 }}
+        {{- end }}
+    ports:
+        - protocol: TCP
+          port: {{ .Values.service.ports.http | int }}
+          targetPort: {{ .Values.service.ports.http | int }}
+
+        {{- if .Values.service.ports.grpc }}
+        - protocol: TCP
+          port: {{ .Values.service.ports.grpc | int }}
+          targetPort: {{ .Values.service.ports.grpc | int }}
+        {{- end }}
+{{- end }}

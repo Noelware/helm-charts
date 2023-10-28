@@ -1,0 +1,22 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "automerge": true,
+    "timezone": "America/Los_Angeles",
+    "extends": ["config:base", "docker:disableMajor"],
+    "labels": ["deps"],
+    "vulnerabilityAlerts": {
+        "schedule": ["at any time"],
+        "labels": ["security"]
+    },
+    "regexManages": [
+        {
+            "description": "Allow updating versions from any datasource in Helm charts",
+            "customType": "regex",
+            "datasourceTemplate": "docker",
+            "fileMatch": ["(^|/)Chart\\.yaml$"],
+            "matchStrings": [
+                "#\\s?renovate: image=(?<depName>.*?)\\s?appVersion:\\s?\\\"?(?<currentValue>[\\w+\\.\\-]*)\\"
+            ]
+        }
+    ]
+}

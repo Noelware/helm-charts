@@ -1,3 +1,4 @@
+{{/*
 # 🐻‍❄️🔮 Noelware's Helm Charts: Curated catalog of Noelware's Helm charts.
 # Copyright (c) 2022-2023 Noelware, LLC. <team@noelware.org>
 #
@@ -18,5 +19,18 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+*/}}
 
-repository: noelware/youtrack
+{{- if not .Values.config.existingMapName -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: {{ printf "%s-%s" (include "bazel-remote.fullname" .) .Values.config.mapName }}
+    labels:
+        {{- include "bazel-remote.labels" | nindent 6 }}
+    annotations:
+        {{- include "bazel-remote.annotations" | nindent 6 }}
+spec:
+    {{ .Values.config.mapKey }}: |-
+        {{- include "common.tplvalues.render" (dict "value" .Values.config.config "context" $) | nindent 4 }}
+{{- end -}}

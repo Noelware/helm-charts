@@ -19,6 +19,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-registry: https://charts.noelware.org/api
-repositories:
-  - ./charts
+charted {
+    version = "~> 0.1.0-beta"
+}
+
+registry "default" {
+    version = 1
+    url     = "https://charts.noelware.org/api"
+}
+
+repository "jetbrains-hub" {
+    readme = "./charts/jetbrains/hub/README.md"
+    source = "./charts/jetbrains/hub"
+
+    config {
+        repository = "noelware/jetbrains-hub"
+        registry   = ["default"]
+    }
+}
+
+repository "jetbrains-youtrack" {
+    readme = "./charts/jetbrains/youtrack/README.md"
+    source = "./charts/jetbrains/youtrack"
+
+    config {
+        repository = "noelware/youtrack"
+        registry   = ["default"]
+    }
+}
+
+repository "bazel-remote-cache" {
+    readme = "./charts/bazel-remote-cache/README.md"
+    source = "./charts/bazel-remote-cache"
+
+    config {
+        repository = "noelware/bazel-remote-cache"
+        registry   = ["default"]
+    }
+}

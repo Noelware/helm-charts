@@ -72,3 +72,86 @@ serviceAccount:
   create: true
   annotations: {}
   name: ""
+
+## @section Configuration Parameters
+##
+## @param config.existingMapName An existing ConfigMap that provides the configuration
+## @param config.configKey The configuration key to use in the ConfigMap, defaults to `config.yml`
+## @param config.mapName The name of the ConfigMap to create or update if `config.existingMapName` is not set.
+## @skip config.config
+config:
+  existingMapName: ""
+  configKey: ""
+  mapName: config
+  config: |-
+    dir: {{ .Values.persistence.path }}
+    max_size: 10000
+    http_address: 0.0.0.0:8080
+
+## @section Service Parameters
+## @descriptionStart
+## Parameters to configure a [Kubernetes service](https://kubernetes.io/docs/concepts/services-networking/service/) to allow external connections to your
+## Bazel Remote Cache instance
+## @descriptionEnd
+##
+## @param service.clusterIP IP to use for the cluster IP if `type` is `ClusterIP`.
+## @param service.enabled Whether or not if a Kubernetes service should be enabled.
+## @param service.type The [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) to use.
+## @param service.selectorLabels Selector to apply this Kubernetes service to
+## @param service.ports.http HTTP port to listen on
+## @param service.ports.grpc gRPC port to listen on
+service:
+  enabled: true
+  type: ClusterIP
+  selectorLabels: {}
+  clusterIP: ""
+  ports:
+    http: "8080"
+    grpc: ""
+
+## @section Ingress
+## @descriptionStart
+## [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress) configuration.
+## @descriptionEnd
+##
+## @param ingress.className Ingress class name to use.
+## @param ingress.enabled Whether if Ingress record generation should be enabled or not.
+## @param ingress.pathType Whatever [path type](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types) to use.
+## @param ingress.hostname Default host for the Ingress record.
+## @param ingress.path Default path for the Ingress record.
+## @param ingress.annotations Additional annotations for the Ingress record. To enable certificate autogeneration, place the `cert-manager` annotations here.
+## @param ingress.extraHosts List of extra hosts to add to the Ingress record.
+## @param ingress.extraPaths List of extra paths to add to the Ingress record.
+## @param ingress.extraRules Any extra rules to add to the Ingress record.
+ingress:
+  enabled: false
+  pathType: ImplementationSpecific
+  hostname: bazel-remote.local
+  className: ""
+  path: /
+  annotations: {}
+  extraHosts: []
+  extraPaths: []
+  extraRules: []
+
+## @section Persistence Parameters
+## @param persistence.enabled whether or not to persist data from bazel-remote-cache
+## @param persistence.path path to use when persisting
+## @param persistence.existingClaim Existing PVC name to mount instead of the chart creating one.
+## @param persistence.storageClass The storage class to use when creating the conf's PVC.
+## @param persistence.annotations Mapping of any extra annotations to append.
+## @param persistence.accessModes List of [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) to use when creating the conf PVC.
+## @param persistence.claimName Name of the PVC to create, if `persistence.data.existingClaim` is not set to `true`.
+## @param persistence.selector Mapping of the [selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to filter when creating the conf PVC.
+## @param persistence.size Size of the PVC to provision.
+persistence:
+  enabled: true
+  path: /var/lib/noelware/bazel/cache
+  existingClaim: ""
+  storageClass: ""
+  annotations: {}
+  claimName: conf
+  selector: {}
+  size: 512Mi
+  accessModes:
+    - ReadWriteMany

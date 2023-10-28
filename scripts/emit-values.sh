@@ -55,6 +55,7 @@ fi
 # TODO(@auguwu): auto generate this list (if we need to)
 charts=(
     "$DIR/charts/bazel-remote-cache"
+    "$DIR/charts/docker-registry"
     "$DIR/charts/jetbrains/hub"
     "$DIR/charts/jetbrains/youtrack"
 )

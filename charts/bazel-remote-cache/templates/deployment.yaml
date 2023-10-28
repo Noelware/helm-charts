@@ -1,3 +1,4 @@
+{{/*
 # 🐻‍❄️🔮 Noelware's Helm Charts: Curated catalog of Noelware's Helm charts.
 # Copyright (c) 2022-2023 Noelware, LLC. <team@noelware.org>
 #
@@ -18,6 +19,81 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+*/}}
 
 apiVersion: apps/v1
 kind: Deployment
+metadata:
+    name: {{ include "bazel-remote.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+    labels:
+        {{- include "bazel-remote.labels" | nindent 6 }}
+    annotations:
+        {{- include "bazel-remote.annotations" | nindent 6 }}
+spec:
+    replicas: {{ .Values.global.replicas }}
+    selector:
+        matchLabels:
+            {{- include "bazel-remote.labels" | nindent 10 }}
+    template:
+        metadata:
+            labels:
+                {{- include "bazel-remote.labels" | nindent 14 }}
+        spec:
+            serviceAccountName: {{ include "bazel-remote.serviceAccountName" . }}
+            {{- if .Values.global.affinity }}
+            affinity: {{- include "common.tplvalues.render" (dict "value" .Values.global.affinity "context" $) | nindent 14 }}
+            {{- end }}
+            {{- if .Values.global.nodeSelector }}
+            nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.global.nodeSelector "context" $) | nindent 14 }}
+            {{- end }}
+            {{- if .Values.global.tolerations }}
+            tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.global.tolerations "context" $) | nindent 14 }}
+            {{- end }}
+
+            volumes:
+                {{ $defaultConfigMapName := printf "%s-%s" (include "bazel-remote.fullname" .) .Values.config.mapName }}
+                - name: config
+                  configMap:
+                    name: {{ default $defaultConfigMapName .Values.config.existingMapName }}
+
+                {{- if .Values.persistence.enabled }}
+                {{ $name := printf "%s-%s" (include "bazel-remote.fullname" .) .Values.persistence.claimName }}
+                - name: data
+                  persistentVolumeClaim:
+                    claimName: {{ default $name .Values.persistence.existingName }}
+                {{- end }}
+
+            {{- if .Values.global.initContainers }}
+            initContainers:
+            {{- include "common.tplvalues.render" (dict "value" .Values.global.initContainers "context" $) | nindent 12 }}
+            {{- end }}
+            securityContext: {{- include "common.tplvalues.render" (dict "value" (default (include "youtrack.defaultPodSecurityContext" .) .Values.global.podSecurityContext) "context" $) | nindent 14 }}
+            containers:
+                - name: {{ include "bazel-remote.fullname" . }}
+                  image: {{ template "bazel-remote.image" . }}
+                  imagePullPolicy: {{ .Values.image.pullPolicy }}
+                  securityContext: {{- include "common.tplvalues.render" (dict "value" (default (include "youtrack.defaultContainerSecurityContext" .) .Values.global.containerSecurityContext) "context" $) | nindent 14 }}
+                  env:
+                    - name: BAZEL_REMOTE_CONFIG_FILE
+                      value: /var/lib/noelware/bazel/config.yml
+                  {{- if .Values.global.extraEnvVars }}
+                  {{- include "common.tplvalues.render" (dict "value" .Values.global.extraEnvVars "context" $) | nindent 20 }}
+                  {{- end }}
+                  {{- $resources := default (include "bazel-remote.defaultResourceLimits" .) .Values.global.resources }}
+                  resources: {{- include "common.tplvalues.render" (dict "value" $resources "context" $) | nindent 20 }}
+                  ports:
+                    - name: http
+                      protocol: TCP
+                      containerPort: {{ .Values.service.ports.http }}
+                    {{- if .Values.service.ports.grpc }}
+                    - name: grpc
+                      protocol: TCP
+                      containerPort: {{ .Values.service.ports.grpc }}
+                    {{- end }}
+                  volumeMounts:
+                    - name: config
+                      mountPath: /var/lib/noelware/bazel/config.yml
+                      readOnly: true
+                    - name: data
+                      mountPath: {{ .Values.persistence.path }}

@@ -1,3 +1,4 @@
+{{/*
 # 🐻‍❄️🔮 Noelware's Helm Charts: Curated catalog of Noelware's Helm charts.
 # Copyright (c) 2022-2023 Noelware, LLC. <team@noelware.org>
 #
@@ -18,3 +19,38 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+*/}}
+
+{{/* if (.Values.service.enabled == false && .Values.ingress.enabled == true) */}}
+{{- if and (not .Values.service.enabled) .Values.ingress.enabled }}
+{{- fail "`service.enabled` should be true to include an ingress record for Bazel Remote Cache" }}
+{{- end }}
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: {{ include "bazel-remote.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+    annotations:
+        {{ include "bazel-remote.annotations" . | nindent 6 }}
+        {{- range $key, $val := .Values.ingress.annotations }}
+            {{ $key }}: {{ $val | quote }}
+        {{- end }}
+spec:
+    {{- if .Values.ingress.className }}
+    ingressClassName: {{ .Values.ingress.className | quote }}
+    {{- end }}
+    rules:
+    {{- if .Values.ingress.hostname }}
+        - host: {{ .Values.ingress.hostname }}
+          http:
+            paths:
+              - path: {{ .Values.ingress.path }}
+                pathType: {{ .Values.ingress.pathType }}
+                backend:
+                    service:
+                        name: {{ include "bazel-remote.fullname" . }}
+                        port:
+                            number: {{ .Values.service.port }}
+    {{- end }}
+{{- end }}
