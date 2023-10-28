@@ -8,7 +8,7 @@
         "schedule": ["at any time"],
         "labels": ["security"]
     },
-    "regexManages": [
+    "regexManagers": [
         {
             "description": "Allow updating versions from any datasource in Helm charts",
             "customType": "regex",
