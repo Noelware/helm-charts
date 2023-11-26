@@ -45,5 +45,5 @@ annotations:
   charts.noelware.org/categories: Authorization,Authentication
 dependencies:
   - name: common
-    version: 2.9.0
+    version: 2.13.3
     repository: oci://registry-1.docker.io/bitnamicharts
