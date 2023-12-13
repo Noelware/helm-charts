@@ -34,7 +34,7 @@ repository "jetbrains-hub" {
 
     config {
         repository = "noelware/jetbrains-hub"
-        registry   = ["default"]
+        registry   = [registry.default]
     }
 }
 
@@ -44,16 +44,26 @@ repository "jetbrains-youtrack" {
 
     config {
         repository = "noelware/youtrack"
-        registry   = ["default"]
+        registry   = [registry.default]
     }
 }
 
-repository "bazel-remote-cache" {
-    readme = "./charts/bazel-remote-cache/README.md"
-    source = "./charts/bazel-remote-cache"
+repository "hazel" {
+    readme = "./charts/noelware/hazel/README.md"
+    source = "./charts/noelware/hazel"
 
     config {
-        repository = "noelware/bazel-remote-cache"
-        registry   = ["default"]
+        repository = "noelware/hazel"
+        registry   = [registry.default]
+    }
+}
+
+repository "petal" {
+    readme = "./charts/noelware/petal/README.md"
+    source = "./charts/noelware/petal"
+
+    config {
+        repository = "noelware/petal"
+        registry   = [registry.default]
     }
 }

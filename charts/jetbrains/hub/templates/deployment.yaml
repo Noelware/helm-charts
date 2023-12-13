@@ -67,53 +67,30 @@ spec:
                 - name: backups
                   persistentVolumeClaim:
                     claimName: {{ default $backupsConf .Values.persistence.backups.existingClaim }}
-            # initContainers:
-            #     - name: {{ include "hub.fullname" . }}-volume-permissions
-            #       {{/* the official image uses debian, so why not use that? */}}
-            #       image: debian:bullseye
-            #       imagePullPolicy: IfNotPresent
-            #       resources: {}
-            #       command:
-            #         - /bin/bash
-            #         - -ec
-            #         - chown -R 13001:13001 /opt/hub/data /opt/hub/logs /opt/hub/backups /opt/hub/conf
-            #       securityContext:
-            #         runAsUser: 0
-            #       volumeMounts:
-            #         - name: data
-            #           mountPath: /opt/hub/data
-            #         - name: logs
-            #           mountPath: /opt/hub/logs
-            #         - name: backups
-            #           mountPath: /opt/hub/backups
-            #         - name: conf
-            #           mountPath: /opt/hub/conf
-            #     {{- if and .Values.configure.enabled .Values.configure.flags }}
-            #     - name: {{ include "hub.fullname" . }}-configure-instance
-            #       image: {{ template "hub.image" . }}
-            #       imagePullPolicy: {{ .Values.image.pullPolicy }}
-            #       resources: {}
-            #       command:
-            #         - /bin/bash
-            #         - -ec
-            #         - youtrack configure {{ .Values.configure.flags }}
-            #         {{- if and .Values.ingress.enabled .Values.ingress.hostname (ne .Values.ingress.hostname "hub.local") }}
-            #         - -base-url=http://{{ .Values.ingress.hostname }}
-            #         {{- end }}
-            #       volumeMounts:
-            #         - name: data
-            #           mountPath: /opt/hub/data
-            #         - name: logs
-            #           mountPath: /opt/hub/logs
-            #         - name: backups
-            #           mountPath: /opt/hub/backups
-            #         - name: conf
-            #           mountPath: /opt/hub/conf
-            #     {{- end }}
-            {{- if .Values.global.initContainers }}
             initContainers:
+                {{- if and .Values.configure.enabled .Values.configure.flags }}
+                - name: {{ include "hub.fullname" . }}-configure-instance
+                  image: {{ template "hub.image" . }}
+                  imagePullPolicy: {{ .Values.image.pullPolicy }}
+                  resources: {}
+                  command:
+                    - /bin/bash
+                    - -ec
+                    - youtrack configure {{ .Values.configure.flags }}
+                    {{- if and .Values.ingress.enabled .Values.ingress.hostname (ne .Values.ingress.hostname "hub.local") }}
+                    - -base-url=http://{{ .Values.ingress.hostname }}
+                    {{- end }}
+                  volumeMounts:
+                    - name: data
+                      mountPath: /opt/hub/data
+                    - name: logs
+                      mountPath: /opt/hub/logs
+                    - name: backups
+                      mountPath: /opt/hub/backups
+                    - name: conf
+                      mountPath: /opt/hub/conf
+                {{- end }}
             {{- include "common.tplvalues.render" (dict "value" .Values.global.initContainers "context" $) | nindent 12 }}
-            {{- end }}
             {{- $podSecurityContext := default (include "hub.defaultPodSecurityContext" .) .Values.global.podSecurityContext }}
             securityContext: {{- include "common.tplvalues.render" (dict "value" $podSecurityContext "context" $) | nindent 14 }}
             containers:

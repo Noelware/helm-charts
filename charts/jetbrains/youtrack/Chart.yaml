@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-kubeVersion: ">=1.24"
+kubeVersion: ">=1.26"
 description: Unofficial Helm chart for the `jetbrains/youtrack` Docker image.
 apiVersion: v2
 

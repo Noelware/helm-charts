@@ -4,8 +4,8 @@
 * [Documentation](https://www.jetbrains.com/help/youtrack/server/introduction-to-youtrack-server.html)
 
 ## Requirements
-* Kubernetes v1.24+
-* Helm 3.10+
+* Kubernetes v1.26 or higher
+* Helm 3.12 or higher
 
 ## Installation
 ```shell

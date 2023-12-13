@@ -67,54 +67,31 @@ spec:
                 - name: backups
                   persistentVolumeClaim:
                     claimName: {{ default $backupsConf .Values.persistence.backups.existingClaim }}
-            # initContainers:
-            #     - name: {{ include "youtrack.fullname" . }}-volume-permissions
-            #       {{/* the official image uses debian, so why not use that? */}}
-            #       image: debian:bullseye
-            #       imagePullPolicy: IfNotPresent
-            #       resources: {}
-            #       command:
-            #         - /bin/bash
-            #         - -ec
-            #         - chown -R 13001:13001 /opt/youtrack/data /opt/youtrack/logs /opt/youtrack/backups /opt/youtrack/conf
-            #       securityContext:
-            #         runAsUser: 0
-            #       volumeMounts:
-            #         - name: data
-            #           mountPath: /opt/youtrack/data
-            #         - name: logs
-            #           mountPath: /opt/youtrack/logs
-            #         - name: backups
-            #           mountPath: /opt/youtrack/backups
-            #         - name: conf
-            #           mountPath: /opt/youtrack/conf
-            #     {{- if and .Values.configure.enabled .Values.configure.flags }}
-            #     - name: {{ include "youtrack.fullname" . }}-configure-instance
-            #       image: {{ template "youtrack.image" . }}
-            #       imagePullPolicy: {{ .Values.image.pullPolicy }}
-            #       resources: {}
-            #       command:
-            #         - /bin/bash
-            #         - -ec
-            #         - youtrack configure {{ .Values.configure.flags }}
-            #         {{- if and .Values.ingress.enabled .Values.ingress.hostname (ne .Values.ingress.hostname "youtrack.local") }}
-            #         - -base-url=http://{{ .Values.ingress.hostname }}
-            #         {{- end }}
-            #         {{- if and .Values.external.hub.enabled .Values.external.hub.url }}
-            #         - -hub-url={{ .Values.external.hub.url }}
-            #         {{- end }}
-            #       volumeMounts:
-            #         - name: data
-            #           mountPath: /opt/youtrack/data
-            #         - name: logs
-            #           mountPath: /opt/youtrack/logs
-            #         - name: backups
-            #           mountPath: /opt/youtrack/backups
-            #         - name: conf
-            #           mountPath: /opt/youtrack/conf
-            #     {{- end }}
             {{- if .Values.global.initContainers }}
             initContainers:
+                {{- if and .Values.configure.enabled .Values.configure.flags }}
+                - name: {{ include "youtrack.fullname" . }}-configure-instance
+                  image: {{ template "youtrack.image" . }}
+                  imagePullPolicy: {{ .Values.image.pullPolicy }}
+                  resources: {}
+                  command:
+                    - configure {{ .Values.configure.flags }}
+                    {{- if and .Values.ingress.enabled .Values.ingress.hostname (ne .Values.ingress.hostname "youtrack.local") }}
+                    - -base-url=http://{{ .Values.ingress.hostname }}
+                    {{- end }}
+                    {{- if and .Values.external.hub.enabled .Values.external.hub.url }}
+                    - -hub-url={{ .Values.external.hub.url }}
+                    {{- end }}
+                  volumeMounts:
+                    - name: data
+                      mountPath: /opt/youtrack/data
+                    - name: logs
+                      mountPath: /opt/youtrack/logs
+                    - name: backups
+                      mountPath: /opt/youtrack/backups
+                    - name: conf
+                      mountPath: /opt/youtrack/conf
+                {{- end }}
             {{- include "common.tplvalues.render" (dict "value" .Values.global.initContainers "context" $) | nindent 12 }}
             {{- end }}
             {{- $podSecurityContext := default (include "youtrack.defaultPodSecurityContext" .) .Values.global.podSecurityContext }}
