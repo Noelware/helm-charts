@@ -24,7 +24,7 @@ description: Unofficial Helm chart for the `jetbrains/hub` Docker image.
 apiVersion: v2
 
 # renovate: image=jetbrains/hub
-appVersion: "2023.2.18873"
+appVersion: "2023.2.20300"
 version: 0.1.0
 type: application
 home: https://jetbrains.com/hub
@@ -45,5 +45,5 @@ annotations:
   charts.noelware.org/categories: Authorization,Authentication
 dependencies:
   - name: common
-    version: 2.9.0
+    version: 2.13.3
     repository: oci://registry-1.docker.io/bitnamicharts
