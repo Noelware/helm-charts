@@ -24,7 +24,7 @@ description: Unofficial Helm chart for the `jetbrains/hub` Docker image.
 apiVersion: v2
 
 # renovate: image=jetbrains/hub
-appVersion: "2023.2.20300"
+appVersion: "2023.3.23062"
 version: 0.1.0
 type: application
 home: https://jetbrains.com/hub
