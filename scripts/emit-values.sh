@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # 🐻‍❄️🔮 Noelware's Helm Charts: Curated catalog of Noelware's Helm charts.
-# Copyright (c) 2022-2023 Noelware, LLC. <team@noelware.org>
+# Copyright (c) 2022-2024 Noelware, LLC. <team@noelware.org>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -33,13 +33,8 @@ done
 
 DIR=$(cd -P "$(dirname "$BASH_SRC")" >/dev/null 2>&1 && pwd)
 
-if ! command -v node >/dev/null; then
-    echo "[ERROR] ===> Missing \`node\` in host machine, install it please!"
-    exit 1
-fi
-
-if ! command -v npm >/dev/null; then
-    echo "[ERROR] ===> Missing \`npm\` in host machine, install it please!"
+if ! command -v bun >/dev/null; then
+    echo "[ERROR] ===> Missing \`bun\` in host machine, install it please!"
     exit 1
 fi
 
@@ -49,13 +44,17 @@ if ! [ -d "$DIR/.cache/bitnami-helm-gen" ]; then
     echo "===> Missing $DIR/.cache/bitnami-helm-gen directory, installing..."
 
     git clone https://github.com/bitnami-labs/readme-generator-for-helm "$DIR/.cache/bitnami-helm-gen"
-    npm install "$DIR/.cache/bitnami-helm-gen"
+    bun install "$DIR/.cache/bitnami-helm-gen"
 fi
 
 # TODO(@auguwu): auto generate this list (if we need to)
 charts=(
     "$DIR/charts/jetbrains/hub"
     "$DIR/charts/jetbrains/youtrack"
+    "$DIR/charts/noelware/hazel"
+    "$DIR/charts/noelware/petal"
+    "$DIR/charts/docker-auth"
+    "$DIR/charts/docker-registry"
 )
 
 for chart in "${charts[@]}"; do
@@ -73,7 +72,7 @@ for chart in "${charts[@]}"; do
     fi
 
     echo ".... Generating..."
-    (cd "$DIR/.cache/bitnami-helm-gen" && node bin/index.js --values "$chart/values.yaml" --readme "$chart/README.md")
+    (cd "$DIR/.cache/bitnami-helm-gen" && bun --bun bin/index.js --values "$chart/values.yaml" --readme "$chart/README.md")
 
     if [ "$?" != "0" ]; then
         echo ".... Failed to generate, view logs above"

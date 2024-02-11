@@ -20,19 +20,19 @@
 # SOFTWARE.
 
 kubeVersion: ">=1.26"
-description: Unofficial Helm chart for the `jetbrains/hub` Docker image.
+description: Unofficial Helm chart for the `cesenta/docker-auth` Docker image.
 apiVersion: v2
 
-# renovate: image=jetbrains/hub
-appVersion: "2023.3.23062"
+# renovate: image=cesenta/docker_auth
+appVersion: "1.12.0"
 version: 0.1.0
 type: application
-home: https://jetbrains.com/hub
-name: hub
+home: https://github.com/cesenta/docker_auth
+name: docker-auth
 keywords:
-  - youtrack
-  - hub
-  - jetbrains
+  - docker
+  - docker_auth
+  - authorization
 maintainers:
   - name: Noelware, LLC.
     email: team@noelware.org
@@ -43,7 +43,10 @@ maintainers:
 annotations:
   charts.noelware.org/licenses: Apache-2.0
   charts.noelware.org/categories: Authorization,Authentication
+  charts.noelware.org/maintainers: |
+    - user: noel
+    - org: noelware
 dependencies:
   - name: common
-    version: 2.14.1
+    version: 2.13.3
     repository: oci://registry-1.docker.io/bitnamicharts

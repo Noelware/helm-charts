@@ -20,19 +20,18 @@
 # SOFTWARE.
 
 kubeVersion: ">=1.26"
-description: Unofficial Helm chart for the `jetbrains/hub` Docker image.
+description: Unofficial Helm chart for the `registry` Docker image.
 apiVersion: v2
 
-# renovate: image=jetbrains/hub
-appVersion: "2023.3.23062"
+# renovate: image=registry
+appVersion: "2.8.3"
 version: 0.1.0
 type: application
-home: https://jetbrains.com/hub
-name: hub
+home: https://github.com/distribution/distribution
+name: docker-auth
 keywords:
-  - youtrack
-  - hub
-  - jetbrains
+  - docker
+  - registry
 maintainers:
   - name: Noelware, LLC.
     email: team@noelware.org
@@ -42,8 +41,11 @@ maintainers:
     url: https://floofy.dev
 annotations:
   charts.noelware.org/licenses: Apache-2.0
-  charts.noelware.org/categories: Authorization,Authentication
+  charts.noelware.org/categories: Registry
+  charts.noelware.org/maintainers: |
+    - user: noel
+    - org: noelware
 dependencies:
   - name: common
-    version: 2.14.1
+    version: 2.13.3
     repository: oci://registry-1.docker.io/bitnamicharts

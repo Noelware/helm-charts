@@ -24,7 +24,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "youtrack.name" -}}
+{{- define "registry.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -33,7 +33,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "youtrack.fullname" -}}
+{{- define "registry.fullname" -}}
 {{- if .Values.fullNameOverride -}}
 {{- .Values.fullNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -49,29 +49,29 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "youtrack.chart" -}}
+{{- define "registry.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "youtrack.labels" -}}
-{{ include "youtrack.selectorLabels" . }}
+{{- define "registry.labels" -}}
+{{ include "registry.selectorLabels" . }}
 k8s.noelware.cloud/managed-by: Helm
 {{- end }}
 
-{{- define "youtrack.selectorLabels" -}}
-k8s.noelware.cloud/name: {{ include "youtrack.name" . }}
+{{- define "registry.selectorLabels" -}}
+k8s.noelware.cloud/name: {{ include "registry.name" . }}
 k8s.noelware.cloud/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "youtrack.serviceAccountName" -}}
+{{- define "registry.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "youtrack.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "registry.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -80,9 +80,9 @@ Create the name of the service account to use
 {{/*
 Default annotations
 */}}
-{{- define "youtrack.annotations" -}}
-k8s.noelware.cloud/component: issue-management
-k8s.noelware.cloud/product: youtrack
+{{- define "registry.annotations" -}}
+k8s.noelware.cloud/component: registry
+k8s.noelware.cloud/product: docker-registry
 {{- if .Chart.AppVersion }}
 k8s.noelware.cloud/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -95,8 +95,7 @@ k8s.noelware.cloud/version: {{ .Chart.AppVersion | quote }}
 {{/*
 Default Pod security context object
 */}}
-{{- define "youtrack.defaultPodSecurityContext" -}}
-fsGroup: 13001
+{{- define "registry.defaultPodSecurityContext" -}}
 seccompProfile:
   type: "RuntimeDefault"
 {{- end -}}
@@ -104,9 +103,7 @@ seccompProfile:
 {{/*
 Default container security context object
 */}}
-{{- define "youtrack.defaultContainerSecurityContext" -}}
-runAsUser: 13001
-runAsNonRoot: true
+{{- define "registry.defaultContainerSecurityContext" -}}
 readOnlyRootFilesystem: false
 allowPrivilegeEscalation: false
 capabilities:
@@ -116,7 +113,7 @@ capabilities:
 {{/*
 Default resource limits
 */}}
-{{- define "youtrack.defaultResourceLimits" -}}
+{{- define "registry.defaultResourceLimits" -}}
 limits:
     memory: 4Gi
     cpu: 1500m
@@ -126,9 +123,9 @@ requests:
 {{- end -}}
 
 {{/*
-Image definition for YouTrack
+Image definition for JetBrains Hub
 */}}
-{{- define "youtrack.image" -}}
+{{- define "registry.image" -}}
 {{/* define our variables */}}
 {{- $registry := default "docker.io" .Values.image.registry -}}
 {{- $repo := .Values.image.image -}}

@@ -526,5 +526,5 @@ FodyWeavers.xsd
 .cache/
 
 # not useful to commit?
+bun.lockb
 package.json
-package-lock.json
