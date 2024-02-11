@@ -1,5 +1,5 @@
 # 🐻‍❄️🔮 noelware/docker-registry
-**noelware/hazel** is the official Helm chart for [`distribution/distribution`](https://github.com/distribution/distribution).
+**noelware/docker-registry** is an unofficial Helm chart for [`distribution/distribution`](https://github.com/distribution/distribution) maintained by [Noelware, LLC.](https://noelware.org).
 
 ## Requirements
 * Kubernetes v1.26 or higher

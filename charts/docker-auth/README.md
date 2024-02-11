@@ -1,5 +1,5 @@
 # 🐻‍❄️🔮 noelware/docker-auth
-**noelware/hazel** is the official Helm chart for [`cesanta/docker_auth`](https://github.com/cesanta/docker_auth).
+**noelware/docker-auth** is the unofficial Helm chart for [`cesanta/docker_auth`](https://github.com/cesanta/docker_auth) maintained by [Noelware, LLC.](https://noelware.org)!
 
 ## Requirements
 * Kubernetes v1.26 or higher
