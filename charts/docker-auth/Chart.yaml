@@ -20,14 +20,14 @@
 # SOFTWARE.
 
 kubeVersion: ">=1.26"
-description: Unofficial Helm chart for the `cesenta/docker-auth` Docker image.
+description: Unofficial Helm chart for the `cesanta/docker_auth` Docker image.
 apiVersion: v2
 
-# renovate: image=cesenta/docker_auth
+# renovate: image=cesanta/docker_auth
 appVersion: "1.12.0"
 version: 0.1.0
 type: application
-home: https://github.com/cesenta/docker_auth
+home: https://github.com/cesanta/docker_auth
 name: docker-auth
 keywords:
   - docker
