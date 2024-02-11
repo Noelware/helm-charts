@@ -45,7 +45,7 @@ annotations:
   charts.noelware.org/categories: IssueManagement
 dependencies:
   - name: common
-    version: 2.13.3
+    version: 2.14.1
     repository: oci://registry-1.docker.io/bitnamicharts
   # - name: hub
   #   version: 0.1.0
