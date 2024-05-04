@@ -18,36 +18,11 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-
-kubeVersion: ">=1.26"
-description: Unofficial Helm chart for the `jetbrains/youtrack` Docker image.
-apiVersion: v2
-
-# renovate: image=jetbrains/youtrack
-appVersion: "2024.1.29548"
-version: 0.2.0
-type: application
-home: https://jetbrains.com/youtrack
-name: youtrack
-icon: https://resources.jetbrains.com/storage/products/company/brand/logos/YouTrack_icon.svg
-keywords:
-  - youtrack
-  - jetbrains
-maintainers:
-  - name: Noelware, LLC.
-    email: team@noelware.org
-    url: https://noelware.org
-  - name: Noel Towa
-    email: cutie@floofy.dev
-    url: https://floofy.dev
-annotations:
-  charts.noelware.org/licenses: Apache-2.0
-  charts.noelware.org/categories: IssueManagement
-dependencies:
-  - name: common
-    version: 2.19.2
-    repository: oci://registry-1.docker.io/bitnamicharts
-  # - name: hub
-  #   version: 0.1.0
-  #   repository: https://charts.noelware.org/~/noelware
-  #   condition: external.hub.enabled
+let
+  lockfile = builtins.fromJSON (builtins.readFile ./flake.lock);
+  compat = builtins.fetchTarball {
+    url = "https://github.com/edolstra/flake-compat/archive/${lockfile.nodes.flake-compat.locked.rev}.tar.gz";
+    sha256 = "${lockfile.nodes.flake-compat.locked.narHash}";
+  };
+in
+  (import compat {src = ./.;}).shellNix.default

@@ -1,0 +1,13 @@
+diff --git a/package.json b/package.json
+index cf86cbc..7c696bc 100644
+--- a/package.json
++++ b/package.json
+@@ -9,7 +9,7 @@
+     "lint": "./node_modules/eslint/bin/eslint.js ."
+   },
+   "bin": {
+-    "readme-generator": "./bin/index.js"
++    "helm-readme-gen": "./bin/index.js"
+   },
+   "keywords": [
+     "README",

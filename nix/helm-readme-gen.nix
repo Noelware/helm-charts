@@ -1,5 +1,5 @@
-# 🐻‍❄️🔮 Noelware's Helm Charts: Curated catalog of Noelware's Helm charts.
-# Copyright (c) 2022-2024 Noelware, LLC. <team@noelware.org>
+# 🐻‍❄️🏴‍☠️ Noel's Helm Charts: Curated catalog of Noel's Helm charts.
+# Copyright (c) 2024 Noel Towa <cutie@floofy.dev>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -18,26 +18,31 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+{pkgs}:
+pkgs.buildNpmPackage rec {
+  pname = "helm-readme-gen";
+  version = "2.6.1";
+  src = pkgs.fetchFromGitHub {
+    owner = "bitnami";
+    repo = "readme-generator-for-helm";
+    rev = "${version}";
+    hash = "sha256-hgVSiYOM33MMxVlt36aEc0uBWIG/OS0l7X7ZYNESO6A=";
+  };
 
-charted {
-    version = ">=0.1.0-beta"
-    helm    = ">=3.12"
-}
+  patches = [
+    # `readme-generator` is too vague, so `helm-readme-gen` will do for now. Just a simple
+    # package.json patch to update the bin name.
+    ./helm-readme-gen_overwrite-bin.patch
+  ];
 
-repository "jetbrains-hub" {
-    registry = registry.default
-    source   = "${cwd}/charts/jetbrains/hub"
-    path     = "noelware/jetbrains-hub"
-}
+  NODE_OPTIONS = "--openssl-legacy-provider";
 
-repository "jetbrains-youtrack" {
-    registry = registry.default
-    source   = "${cwd}/charts/jetbrains/youtrack"
-    path     = "noelware/youtrack"
-}
-
-repository "hazel" {
-    registry = registry.default
-    source   = "${cwd}/charts/noelware/hazel"
-    path     = "noelware/hazel"
+  npmDepsHash = "sha256-baRBchp4dBruLg0DoGq7GsgqXkI/mBBDowtAljC2Ckk=";
+  dontNpmBuild = true;
+  meta = with pkgs.lib; {
+    description = "Auto generate READMEs for Helm Charts";
+    homepage = "https://github.com/bitnami/readme-generator-for-helm";
+    license = licenses.asl20;
+    maintainers = with maintainers; [bitnami];
+  };
 }

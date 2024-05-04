@@ -124,7 +124,7 @@ requests:
 {{- end -}}
 
 {{/*
-Image definition for JetBrains Hub
+Image definition for Docker Auth
 */}}
 {{- define "auth.image" -}}
 {{/* define our variables */}}
@@ -141,3 +141,19 @@ Image definition for JetBrains Hub
 {{/* bring it all together */}}
 {{- printf "%s/%s%s%s" $registry $repo $sep $tag -}}
 {{- end -}}
+
+{{- define "auth.tls.certificate" -}}
+{{- if values.config.tls.generate -}}
+    {{- printf "/app/certs/%s" "server.pem" -}}
+{{- else if values.config.tls.existingSecret -}}
+{{- end -}}
+
+{{/*
+{{- define "redis.tlsCert" -}}
+{{- if (include "redis.createTlsSecret" . ) -}}
+    {{- printf "/opt/bitnami/redis/certs/%s" "tls.crt" -}}
+{{- else -}}
+    {{- required "Certificate filename is required when TLS in enabled" .Values.tls.certFilename | printf "/opt/bitnami/redis/certs/%s" -}}
+{{- end -}}
+{{- end -}}
+*/}}

@@ -84,3 +84,75 @@ serviceAccount:
   create: true
   annotations: {}
   name: ""
+
+## @section Service Parameters
+## @descriptionStart
+## Parameters to configure a [Kubernetes service](https://kubernetes.io/docs/concepts/services-networking/service/) to allow external connections
+## @descriptionEnd
+##
+## @param service.clusterIP IP to use for the cluster IP if `type` is `ClusterIP`.
+## @param service.enabled Whether or not if a Kubernetes service should be enabled.
+## @param service.type The [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) to use.
+## @param service.selectorLabels Selector to apply this Kubernetes service to
+## @param service.port The port that YouTrack will listen on.
+service:
+  enabled: true
+  type: ClusterIP
+  selectorLabels: {}
+  port: 8080
+  clusterIP: ""
+
+## @section Configuration Parameters
+## @descriptionStart
+## Prepares to configure the TLS and configuration file for `docker-auth`.
+## @descriptionEnd
+##
+## @param config.mapName The name of the `ConfigMap` to use.
+## @param config.tls.secret The name of the `Secret` to store the certificates
+## @param config.tls.generate whether or not to generate a self-signed certificate
+## @param config.tls.existingSecret the existing secret to use
+## @skip config.data
+config:
+  mapName: docker-auth-config
+  tls:
+    secret: docker-auth-tls
+    generate: true
+    existingSecret: ""
+  data:
+    token:
+      issuer: "Acme auth server"
+      expiration: 900
+    users:
+      "admin":
+        password: "$2y$05$LO.vzwpWC5LZGqThvEfznu8qhb5SGqvBSWY1J3yZ4AxtMRZ3kN5jC"  # password: badmin
+    acl:
+      - match: {account: "admin"}
+        actions: ["*"]
+        comment: "Admin has full access to everything."
+
+## @section Ingress
+## @descriptionStart
+## [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress) configuration.
+## @descriptionEnd
+##
+## @param ingress.className Ingress class name to use.
+## @param ingress.enabled Whether if Ingress record generation should be enabled or not.
+## @param ingress.pathType Whatever [path type](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types) to use.
+## @param ingress.hostname Default host for the Ingress record.
+## @param ingress.path Default path for the Ingress record.
+## @param ingress.annotations Additional annotations for the Ingress record. To enable certificate autogeneration, place the `cert-manager` annotations here.
+## @param ingress.extraHosts List of extra hosts to add to the Ingress record.
+## @param ingress.extraPaths List of extra paths to add to the Ingress record.
+## @param ingress.extraRules Any extra rules to add to the Ingress record.
+## @param ingress.tls extra TLS records for the Ingress record.
+ingress:
+  enabled: false
+  pathType: ImplementationSpecific
+  hostname: docker-auth.local
+  className: ""
+  path: /
+  tls: []
+  annotations: {}
+  extraHosts: []
+  extraPaths: []
+  extraRules: []
