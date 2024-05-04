@@ -20,24 +20,24 @@
 # SOFTWARE.
 
 charted {
-    version = ">=0.1.0-beta"
-    helm    = ">=3.12"
+  version = ">=0.1.0-beta"
+  helm    = ">=3.12"
 }
 
 repository "jetbrains-hub" {
-    registry = registry.default
-    source   = "${cwd}/charts/jetbrains/hub"
-    path     = "noelware/jetbrains-hub"
+  registry = registry.default
+  source   = "${cwd}/charts/jetbrains/hub"
+  path     = "noelware/jetbrains-hub"
 }
 
 repository "jetbrains-youtrack" {
-    registry = registry.default
-    source   = "${cwd}/charts/jetbrains/youtrack"
-    path     = "noelware/youtrack"
+  registry = registry.default
+  source   = "${cwd}/charts/jetbrains/youtrack"
+  path     = "noelware/youtrack"
 }
 
 repository "hazel" {
-    registry = registry.default
-    source   = "${cwd}/charts/noelware/hazel"
-    path     = "noelware/hazel"
+  registry = registry.default
+  source   = "${cwd}/charts/noelware/hazel"
+  path     = "noelware/hazel"
 }
