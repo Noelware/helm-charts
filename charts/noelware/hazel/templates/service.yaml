@@ -21,17 +21,37 @@
 ~ SOFTWARE.
 */}}
 
-{{- if .Values.serviceAccount.create }}
+{{- if .Values.service.enabled }}
 apiVersion: v1
-kind: ServiceAccount
+kind: Service
 metadata:
-    name: {{ include "hub.serviceAccountName" . }}
+    name: {{ include "hazel.fullname" . }}
     namespace: {{ .Release.Namespace }}
-    labels:
-        {{- include "hub.labels" . | nindent 8 }}
     annotations:
-        {{- include "hub.annotations" . | nindent 8 }}
-        {{- range $key, $val := .Values.serviceAccount.annotations }}
-            {{ $key }}: {{ $val | quote }}
+        {{- include "hazel.annotations" (dict "context" .) | nindent 8 }}
+    labels:
+        {{- include "hazel.labels" . | nindent 8 }}
+spec:
+    type: {{ .Values.service.type }}
+    ports:
+        - protocol: TCP
+          port: {{ .Values.service.port }}
+          targetPort: http
+          {{- if and (or (eq .Values.service.type "NodePort") (eq .Values.service.type "LoadBalancer")) (not (empty .Values.service.nodePort)) }}
+          nodePort: {{ .Values.service.nodePort }}
+          {{- else if eq .Values.service.type "ClusterIP" }}
+          nodePort: null
+          {{- end }}
+    selector:
+        {{- include "hazel.labels" . | nindent 8 }}
+        {{- if .Values.service.selectorLabels }}
+        {{- include "common.tplvalues.render" (dict "value" .Values.service.selectorLabels "context" $) | nindent 8 }}
         {{- end }}
+
+    {{- if and .Values.service.clusterIP (eq .Values.service.type "ClusterIP") }}
+    clusterIP: {{ .Values.service.clusterIP }}
+    {{- end }}
+    {{- if and .Values.service.externalName (eq .Values.service.type "ExternalName") }}
+    externalName: {{ .Values.service.externalName }}
+    {{- end }}
 {{- end }}

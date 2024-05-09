@@ -21,36 +21,40 @@
 ~ SOFTWARE.
 */}}
 
-{{/* if (.Values.service.enabled == false && .Values.ingress.enabled == true) */}}
 {{- if and (not .Values.service.enabled) .Values.ingress.enabled }}
-{{- fail "`service.enabled` should be true to include an ingress record for YouTrack" }}
+{{- fail "`service.enabled` must be set to `true` to include an ingress record" }}
 {{- end }}
-{{- if .Values.ingress.enabled -}}
+{{- if .Values.ingress.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-    name: {{ include "hub.fullname" . }}
+    name: {{ include "hazel.fullname" . }}
     namespace: {{ .Release.Namespace }}
     annotations:
-        {{- include "hub.annotations" . | nindent 8 }}
-        {{- range $key, $val := .Values.ingress.annotations }}
-            {{ $key }}: {{ $val | quote }}
-        {{- end }}
+        {{- $annotations := include "hazel.annotations" (dict "external" .Values.ingress.annotations "context" .) }}
+        {{- $annotations | nindent 8 }}
 spec:
     {{- if .Values.ingress.className }}
-    ingressClassName: {{ .Values.ingress.className | quote }}
+    ingressClassName: {{ .Values.ingress.className }}
     {{- end }}
     rules:
-    {{- if .Values.ingress.hostname }}
-        - host: {{ .Values.ingress.hostname }}
+    {{- if .Values.ingress.host }}
+        - host: {{ .Values.ingress.host }}
           http:
             paths:
               - path: {{ .Values.ingress.path }}
                 pathType: {{ .Values.ingress.pathType }}
                 backend:
                     service:
-                        name: {{ include "hub.fullname" . }}
+                        name: {{ include "hazel.fullname" . }}
                         port:
                             number: {{ .Values.service.port }}
+    {{- end }}
+    {{- if .Values.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.ingress.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.ingress.extraTLS }}
+    tls:
+    {{- include "common.tplvalues.render" (dict "values" .Values.ingress.extraTLS "context" $) | nindent 4 }}
     {{- end }}
 {{- end }}

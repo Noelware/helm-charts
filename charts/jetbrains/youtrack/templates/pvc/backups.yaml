@@ -21,23 +21,4 @@
 ~ SOFTWARE.
 */}}
 
-{{- if not .Values.persistence.backups.existingClaim -}}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-    name: {{ printf "%s-%s" (include "youtrack.fullname" .) .Values.persistence.backups.claimName }}
-    namespace: {{ .Release.Namespace | quote }}
-    labels:
-        {{- include "youtrack.labels" . | nindent 6 }}
-    annotations:
-        {{- include "youtrack.annotations" . | nindent 6 }}
-spec:
-    storageClassName: {{ .Values.persistence.backups.storageClass }}
-    resources:
-        requests:
-            storage: {{ .Values.persistence.backups.size }}
-    accessModes:
-    {{- with .Values.persistence.backups.accessModes -}}
-        {{ toYaml . | nindent 6 }}
-    {{- end }}
-{{- end -}}
+{{- include "youtrack.definePersistentVolumeClaim" (dict "Values" .Values "Chart" .Chart "Release" .Release "name" "backups") -}}

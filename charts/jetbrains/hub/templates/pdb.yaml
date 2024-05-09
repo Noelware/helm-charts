@@ -21,4 +21,20 @@
 ~ SOFTWARE.
 */}}
 
-{{- include "youtrack.definePersistentVolumeClaim" (dict "Values" .Values "Chart" .Chart "Release" .Release "name" "data") -}}
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
+kind: PodDisruptionBudget
+metadata:
+    name: {{ include "hub.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+    annotations:
+        {{- include "hub.annotations" . | nindent 8 }}
+    labels:
+        {{- include "hub.labels" . | nindent 8 }}
+spec:
+    minAvaliable: {{ .Values.podDisruptionBudget.minAvaliable | int }}
+    maxUnavaliable: {{ .Values.podDisruptionBudget.maxUnavailable | int }}
+    selector:
+        matchLabels:
+            {{- include "hub.labels" . | nindent 12 }}
+{{- end }}

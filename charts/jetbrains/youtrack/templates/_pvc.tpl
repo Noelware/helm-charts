@@ -21,27 +21,44 @@
 ~ SOFTWARE.
 */}}
 
-apiVersion: apps/v1
-kind: Deployment
+{{/*
+Defines a generic PVC for JetBrains YouTrack. It must have a section in .Values.persistence (persistent block in `values.yaml`).
+
+Example:
+    {{- include "youtrack.definePersistentVolumeClaim" (dict "Values" .Values "Chart" .Chart "Release" .Release "name" "<name of backup>") -}}
+*/}}
+{{- define "youtrack.definePersistentVolumeClaim" -}}
+{{- if not (typeIs "string" .name) -}}
+    {{ fail (printf "Name [%s] wanted 'string', received '%s'" .name (typeOf .name)) }}
+{{- end -}}
+{{- if not (hasKey .Values.persistence.existingClaims .name) -}}
+    {{ fail (printf ("unknown key: [%s]" .name)) }}
+{{- end -}}
+{{ $claim := get .Values.persistence.existingClaims .name }}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-    name: {{ include "youtrack.fullname" . }}
+    name: {{ printf "%s-%s" (include "youtrack.fullname" .) .name }}
     namespace: {{ .Release.Namespace }}
     labels:
         {{- include "youtrack.labels" . | nindent 8 }}
     annotations:
         {{- include "youtrack.annotations" . | nindent 8 }}
 spec:
-    replicas: {{ .Values.global.replicas }}
-    {{- if .Values.deployment.strategy }}
-    strategy:
-        {{ toYaml .Values.deployment.strategy | nindent 8 }}
+    {{- if .Values.persistence.storageClass }}
+    storageClassName: {{ .Values.persistence.storageClass | quote }}
     {{- end }}
+    resources:
+        requests:
+            storage: {{ get .Values.persistence.sizes .name }}
+    accessModes:
+    {{- with .Values.persistence.accessModes -}}
+        {{ toYaml . | nindent 8 }}
+    {{- end }}
+    {{ $selector := get .Values.persistence.selectors .name -}}
+    {{- if $selector }}
     selector:
-        matchLabels:
-            {{- include "youtrack.labels" . | nindent 12 }}
-    template:
-        metadata:
-            labels:
-                {{- include "youtrack.labels" . | nindent 16 }}
-        spec:
-            {{- include "youtrack.pod" . | nindent 12 -}}
+        {{- toYaml $selector | nindent 8 }}
+    {{- end }}
+{{- end -}}

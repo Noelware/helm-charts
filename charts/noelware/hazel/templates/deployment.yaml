@@ -21,4 +21,23 @@
 ~ SOFTWARE.
 */}}
 
-{{- include "youtrack.definePersistentVolumeClaim" (dict "Values" .Values "Chart" .Chart "Release" .Release "name" "data") -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: {{ include "hazel.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+    annotations:
+        {{- include "hazel.annotations" (dict "context" .) | nindent 8 }}
+    labels:
+        {{- include "hazel.labels" . | nindent 8 }}
+spec:
+    replicas: {{ .Values.global.replicas }}
+    selector:
+        matchLabels:
+            {{- include "hazel.labels" . | nindent 12 }}
+    template:
+        metadata:
+            labels:
+                {{- include "hazel.labels" . | nindent 16 }}
+        spec:
+            {{- include "hazel.pod" . | nindent 12 -}}

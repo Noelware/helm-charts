@@ -23,8 +23,11 @@
 
 {{/*
 Expand the name of the chart.
+
+Example:
+    {{ include "hazel.name" . }}
 */}}
-{{- define "registry.name" -}}
+{{- define "hazel.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -32,8 +35,11 @@ Expand the name of the chart.
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
+
+Example:
+    {{ include "hazel.fullname" }}
 */}}
-{{- define "registry.fullname" -}}
+{{- define "hazel.fullname" -}}
 {{- if .Values.fullNameOverride -}}
 {{- .Values.fullNameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -48,54 +54,80 @@ If release name contains chart name it will be used as a full name.
 
 {{/*
 Create chart name and version as used by the chart label.
+
+Example:
+    {{ include "hazel.chart" . }}
 */}}
-{{- define "registry.chart" -}}
+{{- define "hazel.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Common labels
+Common labels that are attached to each Kubernetes object spawned by the Helm chart.
+
+Example:
+
+    labels:
+        {{- include "hazel.labels" . | nindent 8 }}
 */}}
-{{- define "registry.labels" -}}
-{{ include "registry.selectorLabels" . }}
+{{- define "hazel.labels" -}}
+{{ include "hazel.selectorLabels" . }}
 k8s.noelware.cloud/managed-by: Helm
 {{- end }}
 
-{{- define "registry.selectorLabels" -}}
-k8s.noelware.cloud/name: {{ include "registry.name" . }}
+{{- define "hazel.selectorLabels" -}}
+k8s.noelware.cloud/name: {{ include "hazel.name" . }}
 k8s.noelware.cloud/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
+
+Example:
+    serviceAccountName: {{ include "hazel.serviceAccountName" . | quote }}
 */}}
-{{- define "registry.serviceAccountName" -}}
+{{- define "hazel.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "registry.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "hazel.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
 {{/*
-Default annotations
+Default annotations that are included in each Kubernetes object spawned by the Helm chart.
+
+Example:
+
+    annotations:
+        # with no external annotations
+        {{- include "hazel.annotations" (dict "context" .) }}
+
+        # with external annotations
+        {{- $annotations := dict "hello.world/uwu" "world" }}
+        {{- include "hazel.annotations" (dict "external" $annotations "context" .) }}
 */}}
-{{- define "registry.annotations" -}}
-k8s.noelware.cloud/component: registry
-k8s.noelware.cloud/product: docker-registry
-{{- if .Chart.AppVersion }}
-k8s.noelware.cloud/version: {{ .Chart.AppVersion | quote }}
+{{- define "hazel.annotations" -}}
+k8s.noelware.cloud/component: http-proxy
+k8s.noelware.cloud/product: Hazel
+{{- if .context.Chart.AppVersion }}
+k8s.noelware.cloud/version: {{ .context.Chart.AppVersion | quote }}
 {{- end }}
 
-{{- range $key, $val := .Values.global.annotations }}
+{{- $externalAnnotations := .external | default dict }}
+{{/* "common.tplvalues.merge" conjoins as a YAML string, so we need to `fromYaml` for this to probably work (idk!) */}}
+{{- $all := include "common.tplvalues.merge" (dict "values" (list $externalAnnotations .context.Values.global.annotations) "context" .context) | fromYaml }}
+
+{{- range $key, $val := $all }}
     {{ $key }}: {{ $val | quote }}
-{{- end }}
+{{- end -}}
 {{- end -}}
 
 {{/*
 Default Pod security context object
 */}}
-{{- define "registry.defaultPodSecurityContext" -}}
+{{- define "hazel.defaultPodSecurityContext" -}}
+fsGroup: 1001
 seccompProfile:
   type: "RuntimeDefault"
 {{- end -}}
@@ -103,7 +135,9 @@ seccompProfile:
 {{/*
 Default container security context object
 */}}
-{{- define "registry.defaultContainerSecurityContext" -}}
+{{- define "hazel.defaultContainerSecurityContext" -}}
+runAsUser: 1001
+runAsNonRoot: true
 readOnlyRootFilesystem: false
 allowPrivilegeEscalation: false
 capabilities:
@@ -113,7 +147,7 @@ capabilities:
 {{/*
 Default resource limits
 */}}
-{{- define "registry.defaultResourceLimits" -}}
+{{- define "hazel.defaultResourceLimits" -}}
 limits:
     memory: 4Gi
     cpu: 1500m
@@ -123,9 +157,9 @@ requests:
 {{- end -}}
 
 {{/*
-Image definition for JetBrains Hub
+Image definition for Hazel
 */}}
-{{- define "registry.image" -}}
+{{- define "hazel.image" -}}
 {{/* define our variables */}}
 {{- $registry := default "docker.io" .Values.image.registry -}}
 {{- $repo := .Values.image.image -}}

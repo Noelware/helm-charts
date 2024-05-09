@@ -87,9 +87,13 @@ k8s.noelware.cloud/product: hub
 k8s.noelware.cloud/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 
-{{- range $key, $val := .Values.global.annotations }}
+{{- $externalAnnotations := .external | default dict }}
+{{/* "common.tplvalues.merge" conjoins as a YAML string, so we need to `fromYaml` for this to probably work (idk!) */}}
+{{- $all := include "common.tplvalues.merge" (dict "values" (list $externalAnnotations .Values.global.annotations) "context" .) | fromYaml }}
+
+{{- range $key, $val := $all }}
     {{ $key }}: {{ $val | quote }}
-{{- end }}
+{{- end -}}
 {{- end -}}
 
 {{/*

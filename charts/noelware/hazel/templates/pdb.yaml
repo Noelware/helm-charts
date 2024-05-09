@@ -21,28 +21,20 @@
 ~ SOFTWARE.
 */}}
 
-{{- if .Values.service.enabled }}
-apiVersion: v1
-kind: Service
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
+kind: PodDisruptionBudget
 metadata:
-    name: {{ include "youtrack.fullname" . }}
+    name: {{ include "ume.fullname" . }}
     namespace: {{ .Release.Namespace }}
-    labels:
-        {{- include "youtrack.labels" . | nindent 6 }}
     annotations:
-        {{ include "youtrack.annotations" . | nindent 6 }}
+        {{- include "ume.annotations" . | nindent 8 }}
+    labels:
+        {{- include "ume.labels" . | nindent 8 }}
 spec:
-    type: {{ .Values.service.type | quote }}
-    {{- if .Values.service.clusterIP }}
-    clusterIP: {{ .Values.service.clusterIP | quote }}
-    {{- end }}
+    minAvaliable: {{ .Values.podDisruptionBudget.minAvaliable | int }}
+    maxUnavaliable: {{ .Values.podDisruptionBudget.maxUnavailable | int }}
     selector:
-        {{- include "youtrack.labels" . | nindent 8 }}
-        {{- if .Values.service.selectorLabels }}
-        {{- include "common.tplvalues.render" (dict "value" .Values.service.selectorLabels "context" $) | nindent 8 }}
-        {{- end }}
-    ports:
-        - protocol: TCP
-          port: {{ .Values.service.port }}
-          targetPort: {{ .Values.service.port }}
+        matchLabels:
+            {{- include "ume.labels" . | nindent 12 }}
 {{- end }}

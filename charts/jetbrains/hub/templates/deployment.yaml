@@ -27,93 +27,17 @@ metadata:
     name: {{ include "hub.fullname" . }}
     namespace: {{ .Release.Namespace }}
     labels:
-        {{- include "hub.labels" . | nindent 6 }}
+        {{- include "hub.labels" . | nindent 8 }}
     annotations:
-        {{ include "hub.annotations" . | nindent 6 }}
+        {{- include "hub.annotations" . | nindent 8 }}
 spec:
     replicas: {{ .Values.global.replicas }}
     selector:
         matchLabels:
-            {{- include "hub.labels" . | nindent 10 }}
+            {{- include "hub.labels" . | nindent 12 }}
     template:
         metadata:
             labels:
-                {{- include "hub.labels" . | nindent 14 }}
+                {{- include "hub.labels" . | nindent 16 }}
         spec:
-            serviceAccountName: {{ include "hub.serviceAccountName" . }}
-            {{- if .Values.global.affinity }}
-            affinity: {{- include "common.tplvalues.render" (dict "value" .Values.global.affinity "context" $) | nindent 14 }}
-            {{- end }}
-            {{- if .Values.global.nodeSelector }}
-            nodeSelector: {{- include "common.tplvalues.render" (dict "value" .Values.global.nodeSelector "context" $) | nindent 14 }}
-            {{- end }}
-            {{- if .Values.global.tolerations }}
-            tolerations: {{- include "common.tplvalues.render" (dict "value" .Values.global.tolerations "context" $) | nindent 14 }}
-            {{- end }}
-            volumes:
-                {{ $dataConf := printf "%s-%s" (include "hub.fullname" .) .Values.persistence.data.claimName }}
-                - name: data
-                  persistentVolumeClaim:
-                    claimName: {{ default $dataConf .Values.persistence.data.existingClaim }}
-                {{ $logsConf := printf "%s-%s" (include "hub.fullname" .) .Values.persistence.logs.claimName }}
-                - name: logs
-                  persistentVolumeClaim:
-                    claimName: {{ default $logsConf .Values.persistence.logs.existingClaim }}
-                {{ $pvcConf := printf "%s-%s" (include "hub.fullname" .) .Values.persistence.conf.claimName }}
-                - name: conf
-                  persistentVolumeClaim:
-                    claimName: {{ default $pvcConf .Values.persistence.conf.existingClaim }}
-                {{ $backupsConf := printf "%s-%s" (include "hub.fullname" .) .Values.persistence.backups.claimName }}
-                - name: backups
-                  persistentVolumeClaim:
-                    claimName: {{ default $backupsConf .Values.persistence.backups.existingClaim }}
-            initContainers:
-                {{- if and .Values.configure.enabled .Values.configure.flags }}
-                - name: {{ include "hub.fullname" . }}-configure-instance
-                  image: {{ template "hub.image" . }}
-                  imagePullPolicy: {{ .Values.image.pullPolicy }}
-                  resources: {}
-                  command:
-                    - /bin/bash
-                    - -ec
-                    - youtrack configure {{ .Values.configure.flags }}
-                    {{- if and .Values.ingress.enabled .Values.ingress.hostname (ne .Values.ingress.hostname "hub.local") }}
-                    - -base-url=http://{{ .Values.ingress.hostname }}
-                    {{- end }}
-                  volumeMounts:
-                    - name: data
-                      mountPath: /opt/hub/data
-                    - name: logs
-                      mountPath: /opt/hub/logs
-                    - name: backups
-                      mountPath: /opt/hub/backups
-                    - name: conf
-                      mountPath: /opt/hub/conf
-                {{- end }}
-            {{- include "common.tplvalues.render" (dict "value" .Values.global.initContainers "context" $) | nindent 12 }}
-            {{- $podSecurityContext := default (include "hub.defaultPodSecurityContext" .) .Values.global.podSecurityContext }}
-            securityContext: {{- include "common.tplvalues.render" (dict "value" $podSecurityContext "context" $) | nindent 14 }}
-            containers:
-                - name: {{ include "hub.fullname" . }}
-                  image: {{ template "hub.image" . }}
-                  imagePullPolicy: {{ .Values.image.pullPolicy }}
-                  {{- $containerSecurityContext := default (include "hub.defaultContainerSecurityContext" .) .Values.global.containerSecurityContext }}
-                  securityContext: {{- include "common.tplvalues.render" (dict "value" $containerSecurityContext "context" $) | nindent 20 }}
-                  {{- if .Values.global.extraEnvVars }}
-                  env: {{- include "common.tplvalues.render" (dict "value" .Values.global.extraEnvVars "context" $) | nindent 20}}
-                  {{- end }}
-                  {{- $resources := default (include "hub.defaultResourceLimits" .) .Values.global.resources }}
-                  resources: {{- include "common.tplvalues.render" (dict "value" $resources "context" $) | nindent 20 }}
-                  ports:
-                    - name: http
-                      protocol: TCP
-                      containerPort: {{ .Values.service.port }}
-                  volumeMounts:
-                    - name: data
-                      mountPath: /opt/hub/data
-                    - name: logs
-                      mountPath: /opt/hub/logs
-                    - name: backups
-                      mountPath: /opt/hub/backups
-                    - name: conf
-                      mountPath: /opt/hub/conf
+            {{- include "hub.pod" . | nindent 12 -}}

@@ -28,9 +28,9 @@ metadata:
     name: {{ include "hub.fullname" . }}
     namespace: {{ .Release.Namespace }}
     labels:
-        {{- include "hub.labels" . | nindent 6 }}
+        {{- include "hub.labels" . | nindent 8 }}
     annotations:
-        {{ include "hub.annotations" . | nindent 6 }}
+        {{- include "hub.annotations" . | nindent 8 }}
 spec:
     type: {{ .Values.service.type | quote }}
     {{- if .Values.service.clusterIP }}

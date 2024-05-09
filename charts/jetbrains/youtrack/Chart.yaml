@@ -25,7 +25,7 @@ apiVersion: v2
 
 # renovate: image=jetbrains/youtrack
 appVersion: "2024.1.29548"
-version: 0.2.0
+version: 0.1.0
 type: application
 home: https://jetbrains.com/youtrack
 name: youtrack

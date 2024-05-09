@@ -45,5 +45,5 @@ annotations:
   charts.noelware.org/categories: Proxy
 dependencies:
   - name: common
-    version: 2.14.1
+    version: 2.19.2
     repository: oci://registry-1.docker.io/bitnamicharts

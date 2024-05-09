@@ -21,4 +21,23 @@
 ~ SOFTWARE.
 */}}
 
-{{- include "youtrack.definePersistentVolumeClaim" (dict "Values" .Values "Chart" .Chart "Release" .Release "name" "data") -}}
+{{- if not .Values.config.existingMap }}
+{{/* storage validation */}}
+{{ $storageKinds := list "Filesystem" "S3" "Azure" }}
+{{- if not (has .Values.storage.kind $storageKinds) }}
+    {{- fail (printf "Unknown storage driver: [`%s`], wanted: [%s]" .Values.storage.kind (join ", " $storageKinds)) }}
+{{- end }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: {{ printf "%s-data" (include "hazel.fullname" .) }}
+    namespace: {{ .Release.Namespace }}
+    annotations:
+        {{- include "hazel.annotations" (dict "context" .) | nindent 8 }}
+    labels:
+        {{- include "hazel.labels" . | nindent 8 }}
+data:
+    hazel.hcl: |
+        {{- include "common.tplvalues.render" (dict "value" .Values.deployment.config "context" $) | nindent 8 }}
+{{- end }}

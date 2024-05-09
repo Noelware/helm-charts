@@ -21,17 +21,42 @@
 ~ SOFTWARE.
 */}}
 
-{{- if .Values.serviceAccount.create }}
-apiVersion: v1
-kind: ServiceAccount
+{{/* if (.Values.service.enabled == false && .Values.ingress.enabled == true) */}}
+{{- if and (not .Values.service.enabled) .Values.ingress.enabled }}
+{{- fail "`service.enabled` should be true to include an ingress record for YouTrack" }}
+{{- end }}
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
-    name: {{ include "youtrack.serviceAccountName" . }}
+    name: {{ include "youtrack.fullname" . }}
     namespace: {{ .Release.Namespace }}
-    labels:
-        {{- include "youtrack.labels" . | nindent 6 }}
     annotations:
         {{- include "youtrack.annotations" . | nindent 6 }}
-        {{- range $key, $val := .Values.serviceAccount.annotations }}
+        {{- range $key, $val := .Values.ingress.annotations }}
             {{ $key }}: {{ $val | quote }}
         {{- end }}
+spec:
+    {{- if .Values.ingress.className }}
+    ingressClassName: {{ .Values.ingress.className | quote }}
+    {{- end }}
+    rules:
+    {{- if .Values.ingress.hostname }}
+        - host: {{ .Values.ingress.hostname }}
+          http:
+            paths:
+              - path: {{ .Values.ingress.path }}
+                pathType: {{ .Values.ingress.pathType }}
+                backend:
+                    service:
+                        name: {{ include "youtrack.fullname" . }}
+                        port:
+                            number: {{ .Values.service.port }}
+            {{- if .Values.ingress.extraPaths }}
+            {{- include "common.tplvalues.render" (dict "value" .Values.ingress.extraPaths "context" $) | nindent 14 }}
+            {{- end }}
+    {{- end }}
+    {{- if .Values.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.ingress.extraRules "context" $) | nindent 8 }}
+    {{- end }}
 {{- end }}

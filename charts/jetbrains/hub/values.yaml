@@ -21,10 +21,10 @@
 
 ## @section Global Parameters
 ## @descriptionStart
-## Contains any global parameters that will affected all objects in the `jetbrains-hub` Helm chart.
+## Contains any global parameters that will affected all objects in the JetBrains Hub Helm chart.
 ## @descriptionEnd
 ##
-## @param global.replicas Amount of replicas to spawn
+## @param global.replicas Amount of replicas to use
 ## @param global.resources Resource list to apply to all containers.
 ## @param global.fullNameOverride String to fully override the Helm installation name for all objects
 ## @param global.nameOverride String to override the Helm installation name for all objects, will be in conjunction with a prefix of `<install-name>-`
@@ -37,6 +37,9 @@
 ## @param global.initContainers List of init containers to create.
 ## @param global.podSecurityContext Security context for all spawned Pods. Read more in the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
 ## @param global.containerSecurityContext Security context for all init, sidecar, and normal containers. Read more in the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+## @param global.dnsPolicy DNS policy for the pod.
+## @param global.dnsConfig Configures the [DNS configuration](https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/#pod-dns-config) for the pod.
+## @param global.baseUrl Base URL to use when configuring the Hub server
 global:
   replicas: 1
   fullNameOverride: ""
@@ -50,6 +53,9 @@ global:
   initContainers: []
   podSecurityContext: {}
   containerSecurityContext: {}
+  baseUrl: ""
+  dnsPolicy: ""
+  dnsConfig: {}
   resources: {}
     ## Example:
     ##  limits:
@@ -85,103 +91,89 @@ serviceAccount:
   annotations: {}
   name: ""
 
-## @section Persistence Parameters
-## @param persistence.data.existingClaim Existing PVC name to mount instead of the chart creating one.
-## @param persistence.data.storageClass The storage class to use when creating the data's PVC.
-## @param persistence.data.annotations Mapping of any extra annotations to append.
-## @param persistence.data.accessModes List of [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) to use when creating the data PVC.
-## @param persistence.data.claimName Name of the PVC to create, if `persistence.data.existingClaim` is not set to `true`.
-## @param persistence.data.selector Mapping of the [selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to filter when creating the data PVC.
-## @param persistence.data.size Size of the PVC to provision.
-## @param persistence.backups.existingClaim Existing PVC name to mount instead of the chart creating one.
-## @param persistence.backups.storageClass The storage class to use when creating the backups PVC.
-## @param persistence.backups.annotations Mapping of any extra annotations to append.
-## @param persistence.backups.accessModes List of [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) to use when creating the backups PVC.
-## @param persistence.backups.claimName Name of the PVC to create, if `persistence.data.existingClaim` is not set to `true`.
-## @param persistence.backups.selector Mapping of the [selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to filter when creating the backups PVC.
-## @param persistence.backups.size Size of the PVC to provision.
-## @param persistence.logs.existingClaim Existing PVC name to mount instead of the chart creating one.
-## @param persistence.logs.storageClass The storage class to use when creating the logs's PVC.
-## @param persistence.logs.annotations Mapping of any extra annotations to append.
-## @param persistence.logs.accessModes List of [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) to use when creating the logs PVC.
-## @param persistence.logs.claimName Name of the PVC to create, if `persistence.data.existingClaim` is not set to `true`.
-## @param persistence.logs.selector Mapping of the [selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to filter when creating the logs PVC.
-## @param persistence.logs.size Size of the PVC to provision.
-## @param persistence.conf.existingClaim Existing PVC name to mount instead of the chart creating one.
-## @param persistence.conf.storageClass The storage class to use when creating the conf's PVC.
-## @param persistence.conf.annotations Mapping of any extra annotations to append.
-## @param persistence.conf.accessModes List of [access modes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes) to use when creating the conf PVC.
-## @param persistence.conf.claimName Name of the PVC to create, if `persistence.data.existingClaim` is not set to `true`.
-## @param persistence.conf.selector Mapping of the [selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to filter when creating the conf PVC.
-## @param persistence.conf.size Size of the PVC to provision.
+## @section Deployment Parameters
+## @param deployment.configureFlags List of [JVM configuration flags](https://www.jetbrains.com/help/hub/configure-jvm-options.html) to use when configuring the installation of your Hub server.
+## @param deployment.strategy The [Deployment strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) when creating the deployment.
+deployment:
+  configureFlags: "-J-Xmx1024m"
+  strategy: {}
+  # type: RollingUpdate
+  # rollingUpdate:
+  #   maxSurge: 1
+  #   maxUnavailable: 0
+
+## @section Persistence
+## @param persistence.accessModes List of access modes when creating the Persistent Volume Claim
+## @param persistence.storageClass StorageClass for the PVC creation
 persistence:
-  data:
-    existingClaim: ""
-    storageClass: ""
-    annotations: {}
-    claimName: data
-    selector: {}
-    size: 10Gi
-    accessModes:
-      - ReadWriteMany
+  accessModes: [ReadWriteOnce]
+  storageClass: ""
+
+  ## @section Backups Persistence
+  ## @param persistence.backups.existingClaim If any existing [`PersistentVolumeClaim`](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims) exists for `hub-backups`, then this can be referenced as the PVC and no new object will be created for it.
+  ## @param persistence.backups.selector [object] [Selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to further filter the set of volumes.
+  ## @param persistence.backups.annotations Mapping of the annotations that will be merged with existing annotations for the PVC creation
+  ## @param persistence.backups.size Storage request size for the PVC
   backups:
     existingClaim: ""
-    storageClass: ""
     annotations: {}
-    claimName: backups
     selector: {}
     size: 10Gi
-    accessModes:
-      - ReadWriteMany
+
+  ## @section Data Persistence
+  ## @param persistence.data.existingClaim If any existing [`PersistentVolumeClaim`](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims) exists for `hub-backups`, then this can be referenced as the PVC and no new object will be created for it.
+  ## @param persistence.data.selector [object] [Selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to further filter the set of volumes.
+  ## @param persistence.data.annotations Mapping of the annotations that will be merged with existing annotations for the PVC creation
+  ## @param persistence.data.size Storage request size for the PVC
+  data:
+    existingClaim: ""
+    annotations: {}
+    selector: {}
+    size: 10Gi
+
+  ## @section Logs Persistence
+  ## @param persistence.logs.existingClaim If any existing [`PersistentVolumeClaim`](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims) exists for `hub-logs`, then this can be referenced as the PVC and no new object will be created for it.
+  ## @param persistence.logs.selector [object] [Selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to further filter the set of volumes.
+  ## @param persistence.logs.annotations Mapping of the annotations that will be merged with existing annotations for the PVC creation
+  ## @param persistence.logs.size Storage request size for the PVC
   logs:
     existingClaim: ""
-    storageClass: ""
     annotations: {}
-    claimName: logs
     selector: {}
     size: 5Gi
-    accessModes:
-      - ReadWriteMany
+
+  ## @section Configuration Persistence
+  ## @param persistence.conf.existingClaim If any existing [`PersistentVolumeClaim`](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims) exists for `hub-conf`, then this can be referenced as the PVC and no new object will be created for it.
+  ## @param persistence.conf.selector [object] [Selectors](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#selector) to further filter the set of volumes.
+  ## @param persistence.conf.annotations Mapping of the annotations that will be merged with existing annotations for the PVC creation
+  ## @param persistence.conf.size Storage request size for the PVC
   conf:
     existingClaim: ""
-    storageClass: ""
     annotations: {}
-    claimName: conf
     selector: {}
     size: 512Mi
-    accessModes:
-      - ReadWriteMany
 
 ## @section Service Parameters
 ## @descriptionStart
 ## Parameters to configure a [Kubernetes service](https://kubernetes.io/docs/concepts/services-networking/service/) to allow external connections to your
-## JetBrains Hub instance.
+## Hub instance.
 ## @descriptionEnd
 ##
 ## @param service.clusterIP IP to use for the cluster IP if `type` is `ClusterIP`.
 ## @param service.enabled Whether or not if a Kubernetes service should be enabled.
 ## @param service.type The [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) to use.
 ## @param service.selectorLabels Selector to apply this Kubernetes service to
-## @param service.port The port that JetBrains Hub will listen on.
+## @param service.port The port that Hub will listen on.
+## @param service.externalName If `service.type` == `"ExternalName"`, then this would be set as [`spec.externalName`](https://kubernetes.io/docs/concepts/services-networking/service/#externalname)
+## @param service.loadBalancer If `service.type` == `"LoadBalancer"`, then this would be set as [`status.loadBalancer`](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer)
 service:
   enabled: true
   type: ClusterIP
   selectorLabels: {}
   port: 8080
   clusterIP: ""
-
-## @section Configure Parameters
-## @descriptionStart
-## Parameters to use when configuring your JetBrains Hub installation. This will create a init container
-## that will append a mapping of all flags to passthrough.
-## @descriptionEnd
-##
-## @param configure.enabled Whether of not the init container should be spawned.
-## @param configure.flags A list of flags to inject into the `hub configure` command. This can be used as a Helm template.
-configure:
-  enabled: true
-  flags: |
-    -J-Dorg.eclipse.jetty.server.Request.maxFormKeys=10000 -J-Xmx1024m -no-browser
+  externalName: ""
+  loadBalancer: {}
 
 ## @section Ingress
 ## @descriptionStart
@@ -194,7 +186,6 @@ configure:
 ## @param ingress.hostname Default host for the Ingress record.
 ## @param ingress.path Default path for the Ingress record.
 ## @param ingress.annotations Additional annotations for the Ingress record. To enable certificate autogeneration, place the `cert-manager` annotations here.
-## @param ingress.extraHosts List of extra hosts to add to the Ingress record.
 ## @param ingress.extraPaths List of extra paths to add to the Ingress record.
 ## @param ingress.extraRules Any extra rules to add to the Ingress record.
 ingress:
@@ -204,6 +195,14 @@ ingress:
   className: ""
   path: /
   annotations: {}
-  extraHosts: []
   extraPaths: []
   extraRules: []
+
+## @section Pod Disruption Budget
+## @param podDisruptionBudget.enabled Enables the use of a `PodDisruptionBudget`. Read more in the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions)
+## @param podDisruptionBudget.minAvailable Minimum number (or percentage) of pods that should be remained scheduled
+## @param podDisruptionBudget.maxUnavailable Maximum number (or percentage) of pods that maybe made unavaliable.
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+  maxUnavailable: null

@@ -21,23 +21,4 @@
 ~ SOFTWARE.
 */}}
 
-{{- if not .Values.persistence.data.existingClaim -}}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-    name: {{ printf "%s-%s" (include "hub.fullname" .) .Values.persistence.data.claimName }}
-    namespace: {{ .Release.Namespace | quote }}
-    labels:
-        {{- include "hub.labels" . | nindent 6 }}
-    annotations:
-        {{- include "hub.annotations" . | nindent 6 }}
-spec:
-    storageClassName: {{ .Values.persistence.data.storageClass }}
-    resources:
-        requests:
-            storage: {{ .Values.persistence.data.size }}
-    accessModes:
-    {{- with .Values.persistence.data.accessModes -}}
-        {{ toYaml . | nindent 6 }}
-    {{- end }}
-{{- end -}}
+{{- include "hub.definePersistentVolumeClaim" (dict "persistence" .Values.persistence "context" . "name" "data") -}}

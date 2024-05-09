@@ -21,23 +21,4 @@
 ~ SOFTWARE.
 */}}
 
-{{- if not .Values.persistence.logs.existingClaim -}}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-    name: {{ printf "%s-%s" (include "youtrack.fullname" .) .Values.persistence.logs.claimName }}
-    namespace: {{ .Release.Namespace | quote }}
-    labels:
-        {{- include "youtrack.labels" . | nindent 6 }}
-    annotations:
-        {{- include "youtrack.annotations" . | nindent 6 }}
-spec:
-    storageClassName: {{ .Values.persistence.logs.storageClass }}
-    resources:
-        requests:
-            storage: {{ .Values.persistence.logs.size }}
-    accessModes:
-    {{- with .Values.persistence.logs.accessModes -}}
-        {{ toYaml . | nindent 6 }}
-    {{- end }}
-{{- end -}}
+{{- include "youtrack.definePersistentVolumeClaim" (dict "Values" .Values "Chart" .Chart "Release" .Release "name" "logs") -}}
