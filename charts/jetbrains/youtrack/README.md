@@ -1,5 +1,5 @@
-# 🐻‍❄️🔮 noelware/jetbrains-youtrack
-**noelware/jetbrains-youtrack** is our Helm chart for our internal issue tracker, [YouTrack](https://jetbrains.com/youtrack).
+# 🐻‍❄️🔮 noelware/youtrack
+**noelware/youtrack** is our Helm chart for our internal issue tracker, [YouTrack](https://jetbrains.com/youtrack).
 
 * [Documentation](https://www.jetbrains.com/help/youtrack/server/introduction-to-youtrack-server.html)
 

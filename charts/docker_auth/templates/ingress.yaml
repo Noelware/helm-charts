@@ -1,0 +1,60 @@
+{{/*
+~ 🐻‍❄️🔮 Noelware's Helm Charts: Curated catalog of Noelware's Helm charts.
+~ Copyright (c) 2022-2024 Noelware, LLC. <team@noelware.org>
+~
+~ Permission is hereby granted, free of charge, to any person obtaining a copy
+~ of this software and associated documentation files (the "Software"), to deal
+~ in the Software without restriction, including without limitation the rights
+~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+~ copies of the Software, and to permit persons to whom the Software is
+~ furnished to do so, subject to the following conditions:
+~
+~ The above copyright notice and this permission notice shall be included in all
+~ copies or substantial portions of the Software.
+~
+~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+~ SOFTWARE.
+*/}}
+
+{{- if and (not .Values.service.enabled) .Values.ingress.enabled }}
+{{- fail "`service.enabled` must be set to `true` to include an ingress record" }}
+{{- end }}
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+    name: {{ include "registry.auth.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+    annotations:
+        {{- $annotations := include "registry.auth.annotations" (dict "external" .Values.ingress.annotations "context" .) }}
+        {{- $annotations | nindent 8 }}
+spec:
+    {{- if .Values.ingress.className }}
+    ingressClassName: {{ .Values.ingress.className }}
+    {{- end }}
+    rules:
+    {{- if .Values.ingress.host }}
+        - host: {{ .Values.ingress.host }}
+          http:
+            paths:
+              - path: {{ .Values.ingress.path }}
+                pathType: {{ .Values.ingress.pathType }}
+                backend:
+                    service:
+                        name: {{ include "registry.auth.fullname" . }}
+                        port:
+                            number: {{ .Values.service.port }}
+    {{- end }}
+    {{- if .Values.ingress.extraRules }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.ingress.extraRules "context" $) | nindent 4 }}
+    {{- end }}
+    {{- if .Values.ingress.extraTLS }}
+    tls:
+    {{- include "common.tplvalues.render" (dict "values" .Values.ingress.extraTLS "context" $) | nindent 4 }}
+    {{- end }}
+{{- end }}

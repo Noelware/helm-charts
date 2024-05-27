@@ -21,17 +21,17 @@
 {
   description = "Curated catalog of Noelware's maintained Helm charts";
   inputs = {
-    nixpkgs.url = github:NixOS/nixpkgs/nixpkgs-unstable;
-    flake-utils.url = github:numtide/flake-utils;
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
     flake-compat = {
-      url = github:edolstra/flake-compat;
+      url = "github:edolstra/flake-compat";
       flake = false;
     };
 
     # charted-helm-plugin aren't released on nixpkgs as of 25/04/24
     charted = {
       # TODO(@auguwu): use tag release instead of `main`
-      url = github:charted-dev/charted;
+      url = "github:charted-dev/charted";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-utils.follows = "flake-utils";
@@ -53,7 +53,6 @@
   };
 
   outputs = {
-    self,
     nixpkgs,
     flake-utils,
     charted,
@@ -64,18 +63,17 @@
         inherit system;
       };
 
-      helm = with pkgs;
-        wrapHelm kubernetes-helm {
-          plugins = [
-            charted.packages.${system}.helm-plugin
-          ];
-        };
+      helm = pkgs.wrapHelm pkgs.kubernetes-helm {
+        plugins = [
+          charted.packages.${system}.helm-plugin
+        ];
+      };
     in {
       devShells.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
+        buildInputs = [
           (import ./nix/helm-readme-gen.nix {inherit pkgs;})
 
-          hclfmt
+          pkgs.hclfmt
           helm
         ];
       };
