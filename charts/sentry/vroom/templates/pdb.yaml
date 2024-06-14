@@ -21,23 +21,20 @@
 ~ SOFTWARE.
 */}}
 
-{{- if not .Values.config.existingMap }}
-{{/* storage validation */}}
-{{ $storageKinds := list "Filesystem" "S3" "Azure" }}
-{{- if not (has .Values.storage.kind $storageKinds) }}
-    {{- fail (printf "Unknown storage driver: [`%s`], wanted: [%s]" .Values.storage.kind (join ", " $storageKinds)) }}
-{{- end }}
-
-apiVersion: v1
-kind: ConfigMap
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
+kind: PodDisruptionBudget
 metadata:
-    name: {{ printf "%s-config" (include "hazel.fullname" .) }}
+    name: {{ include "vroom.fullname" . }}
     namespace: {{ .Release.Namespace }}
     annotations:
-        {{- include "hazel.annotations" (dict "context" .) | nindent 8 }}
+        {{- include "vroom.annotations" (dict "context" .) | nindent 8 }}
     labels:
-        {{- include "hazel.labels" . | nindent 8 }}
-data:
-    hazel.hcl: |
-        {{- include "common.tplvalues.render" (dict "value" .Values.deployment.config "context" $) | nindent 8 }}
+        {{- include "vroom.labels" . | nindent 8 }}
+spec:
+    minAvaliable: {{ .Values.podDisruptionBudget.minAvaliable | int }}
+    maxUnavaliable: {{ .Values.podDisruptionBudget.maxUnavailable | int }}
+    selector:
+        matchLabels:
+            {{- include "vroom.labels" . | nindent 12 }}
 {{- end }}

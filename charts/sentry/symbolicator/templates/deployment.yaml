@@ -21,23 +21,23 @@
 ~ SOFTWARE.
 */}}
 
-{{- if not .Values.config.existingMap }}
-{{/* storage validation */}}
-{{ $storageKinds := list "Filesystem" "S3" "Azure" }}
-{{- if not (has .Values.storage.kind $storageKinds) }}
-    {{- fail (printf "Unknown storage driver: [`%s`], wanted: [%s]" .Values.storage.kind (join ", " $storageKinds)) }}
-{{- end }}
-
-apiVersion: v1
-kind: ConfigMap
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-    name: {{ printf "%s-config" (include "hazel.fullname" .) }}
+    name: {{ include "symbolicator.fullname" . }}
     namespace: {{ .Release.Namespace }}
     annotations:
-        {{- include "hazel.annotations" (dict "context" .) | nindent 8 }}
+        {{- include "symbolicator.annotations" (dict "context" .) | nindent 8 }}
     labels:
-        {{- include "hazel.labels" . | nindent 8 }}
-data:
-    hazel.hcl: |
-        {{- include "common.tplvalues.render" (dict "value" .Values.deployment.config "context" $) | nindent 8 }}
-{{- end }}
+        {{- include "symbolicator.labels" . | nindent 8 }}
+spec:
+    replicas: {{ .Values.global.replicas }}
+    selector:
+        matchLabels:
+            {{- include "symbolicator.labels" . | nindent 12 }}
+    template:
+        metadata:
+            labels:
+                {{- include "symbolicator.labels" . | nindent 16 }}
+        spec:
+            {{- include "symbolicator.pod" . | nindent 12 -}}

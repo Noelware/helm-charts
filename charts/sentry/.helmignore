@@ -15,9 +15,14 @@
 *.bak
 *.tmp
 *.orig
+sentry-*.tgz
 *~
 # Various IDEs
 .project
 .idea/
 *.tmproj
 .vscode/
+# other charts in the directory
+snuba/
+symbolicator/
+vroom/

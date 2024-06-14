@@ -35,10 +35,16 @@ done
 
 DIR=$(cd -P "$(dirname "$BASH_SRC")" >/dev/null 2>&1 && pwd)
 charts=(
-    "$DIR/charts/docker_auth"
+    #"$DIR/charts/docker_auth"
+
     "$DIR/charts/jetbrains/hub"
     "$DIR/charts/jetbrains/youtrack"
+
     "$DIR/charts/noelware/hazel"
+
+    #"$DIR/charts/sentry/snuba"
+    "$DIR/charts/sentry/symbolicator"
+    "$DIR/charts/sentry/vroom"
 )
 
 function charts::generate-readme() {
