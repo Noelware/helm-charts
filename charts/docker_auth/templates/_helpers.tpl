@@ -108,8 +108,9 @@ Example:
         {{- include "registry.auth.annotations" (dict "external" $annotations "context" .) }}
 */}}
 {{- define "registry.auth.annotations" -}}
-k8s.noelware.cloud/component: http-proxy
-k8s.noelware.cloud/product: Hazel
+k8s.noelware.cloud/component: authentication
+k8s.noelware.cloud/product: docker-auth
+k8s.noelware.cloud/part-of: cncf-distribution
 {{- if .context.Chart.AppVersion }}
 k8s.noelware.cloud/version: {{ .context.Chart.AppVersion | quote }}
 {{- end }}

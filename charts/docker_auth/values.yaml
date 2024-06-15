@@ -166,16 +166,38 @@ ingress:
 ##
 ## @param tls.enabled whether or not if TLS is enabled.
 ## @param tls.selfSigned whether or not to create a self-signed certidicate via Helm's [`genCA`](https://helm.sh/docs/chart_template_guide/function_list/#genca) Go template function.
+## @param tls.certManager.enabled whether to create certificates from `cert-manager`
+## @param tls.certManager.clusterIssuer If this is set, then this references the cluster issuer. This cannot clash with `tls.certManager.issuer`
+## @param tls.certManager.issuer If this is set, then this references the namespaced issuer. This cannot clash with `tls.certManager.clusterIssuer`
+## @param tls.certManager.group for external issuers, this will be the issuerRef's group.
+## @param tls.certManager.organizations List of organizations to use for the subject
+## @param tls.certManager.renewBefore Duration before the certificate should be renewed
+## @param tls.certManager.duration Duration for the certificate
+## @param tls.certManager.privateKey.algorithm Algorithm for the private cert key
+## @param tls.certManager.privateKey.size Key size for the private cert key
 ## @param tls.secret.existingSecret reference to an existing `Secret` that has `ca.crt` and `ca.key` data pairs.
-## @param tls.secret.crt the `ca.crt` value to use
-## @param tls.secret.key the `ca.key` value to use.
+## @param tls.secret.tlsCrt Value for `tls.crt`
+## @param tls.secret.tlsKey Value for `tls.key`
+## @param tls.secret.caCrt Value for `ca.crt`
 tls:
   enabled: true
   selfSigned: false
+  certManager:
+    enabled: false
+    clusterIssuer: ""
+    issuer: ""
+    group: cert-manager.io
+    organizations: []
+    renewBefore: 360h
+    duration: 2160h
+    privateKey:
+      algorithm: RSA
+      size: 2048
   secret:
     existingSecret: ""
-    crt: ""
-    key: ""
+    tlsCrt: ""
+    tlsKey: ""
+    caCrt: ""
 
 ## @param Deployment Parameters
 ## @skip deployment.config
@@ -202,25 +224,34 @@ tls:
 ## @param deployment.livenessProbe.failureThreshold Minimum consecutive failures for the probe to considered successful.
 deployment:
   existingConfigMap: ""
-  strategy: {}
   logLevel: 2
+  strategy: {}
+
   # example:
   #
   # type: RollingUpdate
   # rollingUpdate:
   #   maxSurge: 1
   #   maxUnavailable: 0
+
   config: |-
     server:
       addr: ":5001"
-      {{- if .Values.tls.enabled }}
-      certificate: "/certs/auth.crt"
-      key: "/certs/auth.key"
+      {{- if and .Values.tls.enabled (not .Values.ingress.tls) }}
+      certificate: "/rootbundle/certs/tls.crt"
+      key: "/rootbundle/certs/tls.key"
+      {{- else if and .Values.ingress.tls .Values.ingress.selfSigned }}
+      certificate: "/server/certs/tls.crt"
+      key: "/server/certs/tls.key"
       {{- end }}
     token:
       # this must match the issuer in the `distribution/distribution` configuration file
       issuer: "Acme auth server"
       expiration: 900
+      {{- if and .Values.tls.enabled .Values.ingress.tls }}
+      certificate: "/rootbundle/certs/tls.crt"
+      key: "/rootbundle/certs/tls.key"
+      {{- end }}
     users:
       # Password is specified as a BCrypt hash. Use `htpasswd -nB USERNAME` to generate.
       "admin":

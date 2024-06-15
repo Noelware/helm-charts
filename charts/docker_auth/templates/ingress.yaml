@@ -25,14 +25,15 @@
 {{- fail "`service.enabled` must be set to `true` to include an ingress record" }}
 {{- end }}
 {{- if .Values.ingress.enabled }}
+{{- $mergedAnnotations := include "common.tplvalues.merge" (dict "values" (list .Values.global.annotations .Values.ingress.annotations) "context" .) | fromYaml -}}
+{{- $isCertManagerRequest := include "common.ingress.certManagerRequest" (dict "annotations" $mergedAnnotations) -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
     name: {{ include "registry.auth.fullname" . }}
     namespace: {{ .Release.Namespace }}
     annotations:
-        {{- $annotations := include "registry.auth.annotations" (dict "external" .Values.ingress.annotations "context" .) }}
-        {{- $annotations | nindent 8 }}
+        {{- include "registry.auth.annotations" (dict "external" .Values.ingress.annotations "context" .) | nindent 8 }}
 spec:
     {{- if .Values.ingress.className }}
     ingressClassName: {{ .Values.ingress.className }}
@@ -53,8 +54,16 @@ spec:
     {{- if .Values.ingress.extraRules }}
     {{- include "common.tplvalues.render" (dict "value" .Values.ingress.extraRules "context" $) | nindent 4 }}
     {{- end }}
-    {{- if .Values.ingress.extraTLS }}
+
+    {{- if or (and .Values.ingress.tls (or $isCertManagerRequest)) .Values.ingress.selfSigned .Values.ingress.extraTLS }}
     tls:
-    {{- include "common.tplvalues.render" (dict "values" .Values.ingress.extraTLS "context" $) | nindent 4 }}
+    {{- if or (and .Values.ingress.tls .Values.ingress.selfSigned) $isCertManagerRequest }}
+    - hosts:
+        - {{ .Values.ingress.host | quote }}
+      secretName: {{ printf "%s-tls" .Values.ingress.host }}
+    {{- end }}
+    {{- if .Values.ingress.extraTLS }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.ingress.extraTLS "context" $) | nindent 4 }}
+    {{- end }}
     {{- end }}
 {{- end }}

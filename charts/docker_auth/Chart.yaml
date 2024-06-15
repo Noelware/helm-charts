@@ -28,10 +28,10 @@ appVersion: "1.12.0"
 version: 0.1.0
 type: application
 home: https://github.com/cesanta/docker_auth
-name: docker_auth
+name: docker-auth
 keywords:
-  - docker-auth
-  - docker-registry
+  - authentication
+  - cncf-distribution
 maintainers:
   - name: Noelware, LLC.
     email: team@noelware.org

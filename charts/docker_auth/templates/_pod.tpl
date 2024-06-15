@@ -45,7 +45,17 @@ dnsConfig:
 volumes:
     - name: config
       configMap:
-        name: {{ default (printf "%s-config" (include "registry.auth.fullname" .)) .Values.config.existingMap }}
+        name: {{ default (printf "%s-config" (include "registry.auth.fullname" .)) .Values.deployment.existingConfigMap }}
+    {{- if .Values.tls.enabled }}
+    - name: rootbundle-tls
+      secret:
+        secretName: "docker-auth-rootbundle-tls"
+    {{- end }}
+    {{- if and .Values.ingress.tls .Values.ingress.selfSigned }}
+    - name: server-tls
+      secret:
+        secretName: {{ printf "%s-server-tls" .Values.ingress.host }}
+    {{- end }}
 {{- with .Values.global.initContainers }}
 initContainers:
     {{- . | toYaml }}
@@ -64,6 +74,16 @@ containers:
         - name: config
           mountPath: /data/config.yaml
           subPath: config.yaml
+        {{- if .Values.tls.enabled }}
+        - name: rootbundle-tls
+          mountPath: /rootbundle/certs
+          readOnly: true
+        {{- end }}
+        {{- if and .Values.ingress.tls .Values.ingress.selfSigned }}
+        - name: server-tls
+          mountPath: /server/certs
+          readOnly: true
+        {{- end }}
       ports:
         - name: http
           containerPort: {{ .Values.service.port }}

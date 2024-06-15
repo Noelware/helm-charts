@@ -21,11 +21,11 @@
 ~ SOFTWARE.
 */}}
 
-{{- if not .Values.config.existingMap }}
+{{- if not .Values.deployment.existingConfigMap }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-    name: {{ printf "%s-data" (include "registry.auth.fullname" .) }}
+    name: {{ printf "%s-config" (include "registry.auth.fullname" .) }}
     namespace: {{ .Release.Namespace }}
     annotations:
         {{- include "registry.auth.annotations" (dict "context" .) | nindent 8 }}
